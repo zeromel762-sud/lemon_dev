@@ -1,0 +1,17 @@
+{
+  "name": "手習い Tenarai — learn Japanese by hand",
+  "short_name": "Tenarai",
+  "description": "Read, write, speak, and look up Japanese — works fully offline once installed.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f1e4",
+  "theme_color": "#b23a2e",
+  "lang": "en",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

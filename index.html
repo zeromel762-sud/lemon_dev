@@ -1,0 +1,2846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🇯🇵 手習い Tenarai — learn Japanese by hand, by ear</title>
+<meta name="description" content="Read, write, speak, and look up Japanese — works fully offline once installed.">
+<meta name="theme-color" content="#b23a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="手習い">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<!-- No external fonts: this app uses each device's built-in Japanese
+     system fonts (Hiragino / Yu / Noto) so it renders correctly with
+     zero network requests, which is what makes offline install possible. -->
+<style>
+  :root{
+    --paper: #f6f1e4;
+    --paper-2: #efe7d4;
+    --sumi: #211f1a;
+    --sumi-soft: #4a463d;
+    --shu: #b23a2e;        /* vermillion seal ink */
+    --shu-dark: #8c2c22;
+    --ai: #26415c;         /* indigo */
+    --ai-soft: #4c6684;
+    --kin: #b6892f;        /* gold */
+    --take: #5c7a52;       /* bamboo green */
+    --line: rgba(33,31,26,.14);
+    --shadow: 0 10px 30px rgba(33,31,26,.10);
+    --radius: 3px;
+    --sidebar-w: 220px;
+  }
+
+  /* ---------- Theme presets (toggled via [data-theme] on <html>) ---------- */
+  html[data-theme="indigo"]{
+    --shu: #26415c; --shu-dark: #1a2f45; --kin: #4c6684;
+  }
+  html[data-theme="bamboo"]{
+    --shu: #5c7a52; --shu-dark: #445c3c; --kin: #b6892f;
+    --paper: #f3f2e6; --paper-2: #ebe9d6;
+  }
+  html[data-theme="sakura"]{
+    --shu: #cf5b78; --shu-dark: #a83f5b; --kin: #c79a5c; --take: #6f9a63;
+    --paper: #fbf1ef; --paper-2: #f6e5e3;
+  }
+  html[data-theme="gold"]{
+    --shu: #b6892f; --shu-dark: #8c6a22; --kin: #b23a2e;
+  }
+  html[data-theme="sumi"]{
+    --paper: #201e1a; --paper-2: #2a2823; --sumi: #ece6d8; --sumi-soft: #b9b2a0;
+    --shu: #d24a3a; --shu-dark: #b23a2e; --ai: #6f93bb; --ai-soft: #8fabce;
+    --kin: #d3a750; --take: #86ab7a;
+    --line: rgba(236,230,216,.14); --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(182,137,47,.06), transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(38,65,92,.06), transparent 45%),
+      var(--paper);
+    color:var(--sumi);
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:rgba(178,58,46,.22); }
+
+  /* faint fibrous paper texture, restrained */
+  .texture{
+    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(33,31,26,.015) 0px, rgba(33,31,26,.015) 1px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(25deg, rgba(33,31,26,.012) 0px, rgba(33,31,26,.012) 1px, transparent 1px, transparent 4px);
+  }
+
+  /* Bamboo theme — soft vertical stalks drifting behind the content */
+  html[data-theme="bamboo"] .texture{
+    opacity:.6;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(33,31,26,.015) 0px, rgba(33,31,26,.015) 1px, transparent 1px, transparent 3px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='420'><g fill='%235c7a52' opacity='0.16'><rect x='16' y='0' width='14' height='420' rx='6'/><rect x='78' y='0' width='10' height='420' rx='5'/></g><g fill='%23445c3c' opacity='0.22'><rect x='14' y='58' width='18' height='6' rx='2'/><rect x='14' y='166' width='18' height='6' rx='2'/><rect x='14' y='274' width='18' height='6' rx='2'/><rect x='14' y='362' width='18' height='6' rx='2'/><rect x='76' y='104' width='14' height='5' rx='2'/><rect x='76' y='212' width='14' height='5' rx='2'/><rect x='76' y='320' width='14' height='5' rx='2'/></g><g fill='%235c7a52' opacity='0.14'><ellipse cx='30' cy='54' rx='19' ry='6' transform='rotate(-30 30 54)'/><ellipse cx='90' cy='100' rx='16' ry='5' transform='rotate(24 90 100)'/><ellipse cx='28' cy='270' rx='17' ry='5' transform='rotate(-18 28 270)'/></g></svg>");
+    background-size: auto, 240px 420px;
+    background-position: 0 0, 8% 0;
+    background-repeat: repeat, repeat-y;
+  }
+
+  /* Sakura theme — cherry-blossom petals drifting over the page */
+  html[data-theme="sakura"] .texture{
+    opacity:.7;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(33,31,26,.012) 0px, rgba(33,31,26,.012) 1px, transparent 1px, transparent 3px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><g fill='%23cf5b78' opacity='0.22'><ellipse cx='60' cy='42' rx='8' ry='13'/><ellipse cx='60' cy='42' rx='8' ry='13' transform='rotate(72 60 60)'/><ellipse cx='60' cy='42' rx='8' ry='13' transform='rotate(144 60 60)'/><ellipse cx='60' cy='42' rx='8' ry='13' transform='rotate(216 60 60)'/><ellipse cx='60' cy='42' rx='8' ry='13' transform='rotate(288 60 60)'/></g><circle cx='60' cy='60' r='3.5' fill='%23c79a5c' opacity='0.3'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='70' height='70'><g fill='%23cf5b78' opacity='0.14'><ellipse cx='35' cy='24' rx='5' ry='8'/><ellipse cx='35' cy='24' rx='5' ry='8' transform='rotate(72 35 35)'/><ellipse cx='35' cy='24' rx='5' ry='8' transform='rotate(144 35 35)'/><ellipse cx='35' cy='24' rx='5' ry='8' transform='rotate(216 35 35)'/><ellipse cx='35' cy='24' rx='5' ry='8' transform='rotate(288 35 35)'/></g></svg>");
+    background-size: auto, 200px 200px, 130px 130px;
+    background-position: 0 0, 0 0, 60px 90px;
+    background-repeat: repeat, repeat, repeat;
+  }
+
+  a{ color:inherit; }
+
+
+  /* ---------- Header ---------- */
+  header{
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px;
+    padding:16px clamp(18px,4vw,48px) 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:14px; }
+  /* Hinomaru mark — a white disc holding a red disc, echoing the Japanese
+     flag. Pure CSS/no image, so it's offline-safe and crisp at any size. */
+  .brand-mark{
+    width:46px; height:46px; border-radius:50%;
+    background:#fdfcf8;
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(178,58,46,.08);
+  }
+  .brand-mark::before{
+    content:''; width:58%; height:58%; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #d24a3a, var(--shu) 55%, var(--shu-dark) 100%);
+  }
+  .flag-badge{
+    font-size:15px; line-height:1; margin-left:2px; filter:saturate(1.05);
+  }
+  .brand-text h1{
+    margin:0; font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:clamp(22px,3vw,30px); letter-spacing:.02em; line-height:1;
+  }
+  .brand-text h1 .en{
+    display:block; font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-weight:500;
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--sumi-soft); margin-top:6px;
+  }
+  .tagline{
+    font-size:12.5px; color:var(--sumi-soft); max-width:220px; text-align:right;
+    line-height:1.5; display:none;
+  }
+  @media(min-width:760px){ .tagline{ display:block; } }
+
+  /* stamp album — signature element, top right */
+  .stamp-album{
+    position:relative; z-index:2;
+    display:flex; align-items:center; gap:8px;
+    padding:9px 14px 9px 10px;
+    border:1px solid var(--line); border-radius:999px;
+    background:rgba(255,253,247,.6);
+    flex-shrink:0;
+  }
+  .stamp-dots{ display:flex; gap:4px; }
+  .stamp-dot{
+    width:9px; height:9px; border-radius:50%;
+    border:1.4px solid rgba(178,58,46,.35);
+    background:transparent;
+    transition:background .25s, transform .25s;
+  }
+  .stamp-dot.filled{ background:var(--shu); border-color:var(--shu); }
+  .stamp-count{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; color:var(--sumi-soft); white-space:nowrap; }
+
+  /* full-screen stamp burst, fires on award */
+  .stamp-burst{
+    position:fixed; top:50%; left:50%; z-index:80;
+    width:150px; height:150px; margin:-75px 0 0 -75px;
+    border-radius:50%;
+    border:5px solid var(--shu);
+    color:var(--shu);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    pointer-events:none;
+    opacity:0; transform:scale(.5) rotate(-14deg);
+    background:rgba(246,241,228,.94);
+    box-shadow:0 18px 40px rgba(33,31,26,.22);
+  }
+  .stamp-burst.fire{ animation:stampFire 1.1s cubic-bezier(.2,1.4,.4,1) forwards; }
+  .stamp-burst .big{ font-size:30px; line-height:1; }
+  .stamp-burst .small{ font-size:10px; letter-spacing:.14em; margin-top:6px; text-transform:uppercase; font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-weight:600; }
+  @keyframes stampFire{
+    0%{ opacity:0; transform:scale(.4) rotate(-18deg); }
+    18%{ opacity:1; transform:scale(1.08) rotate(-6deg); }
+    28%{ transform:scale(1) rotate(-6deg); }
+    75%{ opacity:1; transform:scale(1) rotate(-6deg); }
+    100%{ opacity:0; transform:scale(.94) rotate(-6deg); }
+  }
+
+  /* ---------- Flag strip ---------- */
+  .flag-strip{
+    position:relative; z-index:2;
+    height:4px;
+    background:#fdfcf8;
+    display:flex; justify-content:center; align-items:center;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .flag-strip::before{
+    content:''; width:14px; height:14px; border-radius:50%;
+    background:var(--shu); margin-top:-1px;
+  }
+
+  /* ---------- Menu button (mobile sidebar toggle) ---------- */
+  .menu-btn{
+    appearance:none; cursor:pointer; border:1px solid var(--line); background:transparent;
+    border-radius:8px; width:40px; height:40px; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; gap:3px; flex-direction:column;
+    transition:border-color .15s, background .15s;
+  }
+  .menu-btn span{ display:block; width:18px; height:2px; background:var(--sumi); border-radius:1px; transition:background .15s; }
+  .menu-btn:hover{ border-color:var(--ai-soft); }
+  .menu-btn[aria-expanded="true"]{ background:rgba(178,58,46,.08); border-color:var(--shu); }
+  .menu-btn[aria-expanded="true"] span{ background:var(--shu-dark); }
+
+  /* ---------- App shell (sidebar + content) ---------- */
+  .app-shell{ position:relative; display:flex; align-items:stretch; }
+  .content-col{ flex:1; min-width:0; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:var(--sidebar-w); flex-shrink:0;
+    border-right:1px solid var(--line);
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:14px 0 0;
+    min-height:calc(100vh - 78px);
+    transition:width .2s ease, min-width .2s ease, padding .2s ease, opacity .15s ease;
+    overflow:hidden;
+  }
+  @media(min-width:901px){
+    .app-shell.sidebar-hidden .sidebar{
+      width:0; min-width:0; padding-left:0; padding-right:0; border-right:none; opacity:0;
+    }
+  }
+  .side-nav{ display:flex; flex-direction:column; gap:1px; }
+  .sidebar .tab{
+    appearance:none; border:none; background:none; cursor:pointer; text-align:left;
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; font-weight:700;
+    color:var(--sumi-soft);
+    padding:13px 22px;
+    display:flex; align-items:baseline; gap:10px;
+    border-left:3px solid transparent;
+    border-bottom:none;
+    white-space:nowrap; width:100%;
+    touch-action:manipulation;
+  }
+  .sidebar .tab .jp{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:18px; color:var(--sumi); }
+  .sidebar .tab .en{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; }
+  .sidebar .tab.active{ border-left-color:var(--shu); background:rgba(178,58,46,.06); }
+  .sidebar .tab.active .jp, .sidebar .tab.active .en{ color:var(--shu-dark); }
+  .sidebar .tab:hover .jp{ color:var(--shu); }
+  .sidebar-bottom{
+    padding:10px 0 22px; border-top:1px solid var(--line); margin-top:14px;
+  }
+  .sidebar-bottom .tab{ font-weight:700; }
+  .sidebar-bottom .tab .jp{ font-size:16px; }
+
+  @media(max-width:900px){
+    .sidebar{
+      position:fixed; top:0; left:0; bottom:0; z-index:100;
+      background:var(--paper); box-shadow:var(--shadow);
+      transform:translateX(-100%); transition:transform .25s ease;
+      padding-top:80px; min-height:100vh; width:min(78vw,300px);
+    }
+    .sidebar.open{ transform:translateX(0); }
+  }
+  .sidebar-overlay{
+    display:none; position:fixed; inset:0; background:rgba(33,31,26,.35); z-index:99;
+  }
+  .sidebar-overlay.show{ display:block; }
+  @media(min-width:901px){ .sidebar-overlay{ display:none !important; } }
+
+  /* ---------- Main layout ---------- */
+  main{ position:relative; z-index:2; padding:26px clamp(18px,4vw,48px) 56px; max-width:1040px; margin:0 auto; }
+  .panel{ display:none; animation:rise .35s ease; }
+  .panel.active{ display:block; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-head{ margin-bottom:18px; max-width:680px; }
+  .eyebrow{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--shu); margin:0 0 8px;
+  }
+  .section-head h2{
+    margin:0 0 10px; font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:clamp(24px,3.4vw,34px);
+  }
+  .section-head p{ margin:0; color:var(--sumi-soft); line-height:1.65; font-size:14.5px; }
+
+  /* ---------- Reading tab ---------- */
+  .script-toggle{ display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; margin-bottom:22px; }
+  .script-toggle button{
+    appearance:none; border:none; background:none; cursor:pointer;
+    padding:9px 20px; font-weight:700; font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; font-size:13.5px;
+    color:var(--sumi-soft);
+  }
+  .script-toggle button.active{ background:var(--sumi); color:var(--paper); }
+
+  .kana-groups{ display:flex; flex-direction:column; gap:26px; }
+  .kana-group-title{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sumi-soft); margin:0 0 10px; display:flex; align-items:center; gap:10px;
+  }
+  .kana-group-title::after{ content:''; flex:1; height:1px; background:var(--line); }
+  .kana-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(76px,1fr)); gap:8px;
+  }
+  .kana-cell{
+    appearance:none; cursor:pointer; text-align:left;
+    border:1px solid var(--line); background:rgba(255,253,247,.55);
+    border-radius:var(--radius); padding:10px 6px 8px;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .kana-cell:hover{ border-color:var(--ai-soft); transform:translateY(-2px); }
+  .kana-cell.speaking{ border-color:var(--shu); background:rgba(178,58,46,.07); }
+  .kana-cell.learned{ border-color: var(--take); }
+  .kana-cell.learned::after{ content:'✓'; font-size:9px; color:var(--take); margin-top:1px; font-family:'SFMono-Regular','Consolas','Menlo',monospace; }
+  .kana-cell .glyph{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:25px; line-height:1; }
+  .kana-cell .romaji{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10px; color:var(--sumi-soft); letter-spacing:.03em; }
+  .kana-cell.empty{ visibility:hidden; pointer-events:none; }
+
+  .kanji-strip{ margin-top:26px; }
+  .kanji-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .kanji-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:14px; cursor:pointer; transition:border-color .15s, transform .1s; position:relative;
+  }
+  .kanji-card:hover{ border-color:var(--ai-soft); transform:translateY(-2px); }
+  .kanji-card.learned{ border-color:var(--take); }
+  .kanji-card .glyph{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:32px; line-height:1; color:var(--sumi); }
+  .kanji-card .readings{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px; color:var(--ai); margin-top:8px; }
+  .kanji-card .readings b{ color:var(--sumi-soft); font-weight:600; }
+  .kanji-card .mean{ font-size:12.5px; color:var(--sumi-soft); margin-top:4px; }
+
+  /* ---------- Writing tab ---------- */
+  .write-layout{ display:grid; grid-template-columns:minmax(0,300px) 1fr; gap:34px; align-items:start; }
+  @media(max-width:760px){ .write-layout{ grid-template-columns:1fr; } }
+  .write-target{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+  .genko{
+    position:relative; width:260px; height:260px;
+    border:1.6px solid var(--sumi);
+    background:rgba(255,253,247,.5);
+  }
+  .genko::before, .genko::after{
+    content:''; position:absolute; background:rgba(178,58,46,.35);
+  }
+  .genko::before{ left:50%; top:0; bottom:0; width:1px; }
+  .genko::after{ top:50%; left:0; right:0; height:1px; }
+  #writeCanvas{ position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; touch-action:none; }
+  .write-meta{ text-align:center; }
+  .write-meta .romaji{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:12px; color:var(--sumi-soft); }
+  .write-meta .mean{ font-size:13px; color:var(--sumi-soft); margin-top:3px; }
+  .write-controls{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .write-feedback{
+    text-align:center; font-size:12.5px; font-family:'SFMono-Regular','Consolas','Menlo',monospace;
+    min-height:16px; margin-top:2px;
+  }
+  .write-feedback.ok{ color:var(--take); }
+  .write-feedback.no{ color:var(--shu); }
+
+  .btn{
+    appearance:none; cursor:pointer; border-radius:999px; border:1px solid var(--sumi);
+    background:transparent; color:var(--sumi); font-weight:700; font-size:13px;
+    padding:10px 18px; font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif;
+    display:inline-flex; align-items:center; gap:7px;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .btn:hover{ background:var(--sumi); color:var(--paper); }
+  .btn.primary{ background:var(--shu); border-color:var(--shu); color:#fff8ee; }
+  .btn.primary:hover{ background:var(--shu-dark); border-color:var(--shu-dark); }
+  .btn.ghost{ border-color:var(--line); color:var(--sumi-soft); }
+  .btn.ghost:hover{ background:var(--sumi-soft); border-color:var(--sumi-soft); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .btn:disabled:hover{ background:transparent; color:var(--sumi); }
+  .btn.small{ padding:7px 13px; font-size:11.5px; }
+
+  .write-pool{ display:flex; flex-direction:column; gap:10px; }
+  .pool-row{ display:flex; align-items:center; gap:10px; }
+  .pool-row label{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--sumi-soft); width:70px; }
+  .pool-btn{
+    appearance:none; border:1px solid var(--line); background:transparent; border-radius:6px;
+    padding:6px 12px; cursor:pointer; font-weight:700; font-size:12.5px; color:var(--sumi-soft);
+  }
+  .pool-btn.on{ background:var(--ai); color:#fff; border-color:var(--ai); }
+  .write-tip{
+    margin-top:20px; padding:16px 18px; border-left:3px solid var(--kin);
+    background:rgba(182,137,47,.07); font-size:13px; color:var(--sumi-soft); line-height:1.6;
+  }
+  .write-tip b{ color:var(--sumi); }
+
+  /* ---------- Speaking tab ---------- */
+  .phrase-list{ display:flex; flex-direction:column; gap:10px; }
+  .phrase-group-title{ margin-top:8px; }
+  .phrase-group-title:first-child{ margin-top:0; }
+  .phrase-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:16px 18px; display:flex; align-items:center; gap:16px; justify-content:space-between;
+    flex-wrap:wrap;
+  }
+  .phrase-jp{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:21px; }
+  .phrase-sub{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; color:var(--sumi-soft); margin-top:4px; }
+  .phrase-en{ font-size:12.5px; color:var(--sumi-soft); margin-top:2px; }
+  .phrase-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .phrase-result{ font-size:12px; font-family:'SFMono-Regular','Consolas','Menlo',monospace; min-width:118px; }
+  .phrase-result.ok{ color:var(--take); }
+  .phrase-result.no{ color:var(--shu); }
+  .mic-btn.listening{ background:var(--shu); border-color:var(--shu); color:#fff; animation:pulseMic 1s infinite; }
+  @keyframes pulseMic{ 0%,100%{ box-shadow:0 0 0 0 rgba(178,58,46,.4);} 50%{ box-shadow:0 0 0 8px rgba(178,58,46,0);} }
+  .speech-warning{
+    margin-top:18px; padding:14px 16px; border:1px dashed var(--line); border-radius:var(--radius);
+    font-size:12.5px; color:var(--sumi-soft); display:none;
+  }
+
+  /* ---------- Translate tab ---------- */
+  .translate-mic-wrap{ text-align:center; margin:8px 0 22px; }
+  .mic-btn.big{
+    width:92px; height:92px; border-radius:50%; font-size:32px;
+    display:inline-flex; align-items:center; justify-content:center; padding:0;
+  }
+  .translate-result{
+    display:none; flex-direction:column; gap:14px;
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:24px;
+  }
+  .translate-line{ display:flex; align-items:center; gap:12px; }
+  .translate-label{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:.12em; color:var(--sumi-soft); width:78px; flex-shrink:0;
+  }
+  .translate-line span:not(.translate-label){ flex:1; font-size:16px; }
+  .translate-line:last-child span:not(.translate-label){
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:20px;
+  }
+  .translate-arrow{ text-align:center; color:var(--sumi-soft); font-size:11px; letter-spacing:.08em; margin:-4px 0; }
+  .translate-history-title{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--sumi-soft); margin:0 0 10px;
+  }
+  .translate-history{ display:flex; flex-direction:column; gap:8px; }
+  .translate-history .dict-card{ cursor:pointer; }
+  .translate-history .dict-card:hover{ border-color:var(--ai-soft); }
+
+  /* ---------- Dictionary tab ---------- */
+  .dict-search{ display:flex; gap:10px; margin-bottom:8px; }
+  .dict-search input{
+    flex:1; border:1px solid var(--sumi); border-radius:999px; padding:12px 20px;
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; font-size:15px; background:rgba(255,253,247,.6); color:var(--sumi);
+  }
+  .dict-search input:focus{ outline:2px solid var(--ai-soft); outline-offset:1px; }
+  .dict-search .mic-btn{ padding:10px 14px; font-size:15px; flex-shrink:0; }
+  .dict-mic-hint{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; color:var(--sumi-soft);
+    min-height:14px; margin-bottom:2px;
+  }
+  .dict-mic-hint.ok{ color:var(--take); }
+  .dict-mic-hint.no{ color:var(--shu); }
+  .dict-status{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; color:var(--sumi-soft); margin:10px 0 18px; min-height:14px; }
+  .dict-results{ display:flex; flex-direction:column; gap:10px; }
+  .dict-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:14px 18px; display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;
+  }
+  .dict-card .jp{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:20px; }
+  .dict-card .kana{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; color:var(--ai); }
+  .dict-card .en{ font-size:13px; color:var(--sumi-soft); flex:1; min-width:160px; }
+  .dict-card .src{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+    padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--sumi-soft); flex-shrink:0;
+  }
+  .dict-card .src.live{ border-color:var(--take); color:var(--take); }
+  .dict-card .fav{ appearance:none; border:none; background:none; cursor:pointer; font-size:16px; color:var(--line); line-height:1; }
+  .dict-card .fav.on{ color:var(--kin); }
+  .dict-empty{ font-size:13px; color:var(--sumi-soft); padding:20px 0; }
+  .dict-history{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 18px; }
+  .dict-history button{
+    appearance:none; border:1px solid var(--line); background:rgba(255,253,247,.5); border-radius:999px;
+    padding:5px 12px; font-size:11.5px; font-family:'SFMono-Regular','Consolas','Menlo',monospace; color:var(--sumi-soft); cursor:pointer;
+  }
+
+  /* ---------- Settings tab ---------- */
+  .theme-grid{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:10px; }
+  .theme-swatch{
+    appearance:none; cursor:pointer; border:1.6px solid var(--line); background:rgba(255,253,247,.55);
+    border-radius:var(--radius); padding:14px 16px; width:132px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+    transition:border-color .15s, transform .1s;
+  }
+  .theme-swatch:hover{ transform:translateY(-2px); border-color:var(--ai-soft); }
+  .theme-swatch.active{ border-color:var(--shu); }
+  .theme-swatch .dots{ display:flex; gap:5px; }
+  .theme-swatch .dots i{ width:14px; height:14px; border-radius:50%; display:block; }
+  .theme-swatch .name{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; letter-spacing:.06em;
+    color:var(--sumi-soft);
+  }
+  .theme-swatch.active .name{ color:var(--shu-dark); font-weight:700; }
+
+  .settings-block{ margin-bottom:34px; max-width:640px; }
+  .settings-block h3{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--sumi-soft); margin:0 0 14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .settings-block h3::after{ content:''; flex:1; height:1px; background:var(--line); }
+
+  .dev-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:18px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .dev-avatar{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%, var(--kin), var(--shu) 70%);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff8ee; font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800; font-size:18px;
+  }
+  .dev-info .dev-name{ font-weight:700; font-size:14.5px; color:var(--sumi); }
+  .dev-info .dev-email{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:12px; color:var(--sumi-soft); margin-top:3px;
+  }
+  .dev-info .dev-email a{ color:var(--ai); text-decoration:none; }
+  .dev-info .dev-email a:hover{ text-decoration:underline; }
+
+  .notify-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .notify-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .notify-title{ font-weight:700; font-size:14px; color:var(--sumi); }
+  .notify-status{ font-size:12px; color:var(--sumi-soft); margin-top:3px; }
+  .notify-status.on{ color:var(--take); }
+  .notify-status.off{ color:var(--shu); }
+  .notify-note{ margin:12px 0 0; font-size:11.5px; color:var(--sumi-soft); line-height:1.6; }
+
+  /* ---------- Dashboard: word of the day ---------- */
+  .wotd-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:20px 22px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  }
+  .wotd-glyph{
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:56px; line-height:1; color:var(--shu-dark); flex-shrink:0;
+  }
+  .wotd-info{ flex:1; min-width:160px; }
+  .wotd-kana{ font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-size:16px; color:var(--sumi); }
+  .wotd-romaji{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; color:var(--ai); margin-top:2px; }
+  .wotd-en{ font-size:14px; color:var(--sumi-soft); margin-top:4px; font-weight:700; }
+  .wotd-example{ font-size:12.5px; color:var(--sumi-soft); margin-top:10px; line-height:1.6; }
+  .wotd-example .en{ display:block; margin-top:2px; opacity:.85; }
+
+  /* ---------- Dashboard: Japan intro + quick facts ---------- */
+  .japan-intro{ display:grid; grid-template-columns:1.3fr 1fr; gap:26px; align-items:start; }
+  @media(max-width:760px){ .japan-intro{ grid-template-columns:1fr; } }
+  .japan-intro-text p{ margin:0 0 12px; font-size:13.5px; line-height:1.7; color:var(--sumi-soft); }
+  .japan-intro-text p:last-child{ margin-bottom:0; }
+  .japan-intro-text i{ font-style:normal; color:var(--sumi); font-weight:600; }
+  .fact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .fact-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.5); border-radius:var(--radius);
+    padding:10px 12px; display:flex; flex-direction:column; gap:3px;
+  }
+  .fact-label{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:9.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--sumi-soft);
+  }
+  .fact-value{ font-size:12.5px; font-weight:700; color:var(--sumi); }
+
+  /* ---------- Dashboard: map ---------- */
+  .japan-map-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .japan-map{ width:100%; max-width:230px; height:auto; }
+  .japan-map .island{ fill:var(--ai); fill-opacity:.14; stroke:var(--ai-soft); stroke-width:1.2; }
+  .japan-map .island.honshu{ fill-opacity:.16; }
+  .japan-map .island-label{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:8.5px; letter-spacing:.06em;
+    fill:var(--sumi-soft);
+  }
+  .japan-map .city circle{ fill:var(--shu); }
+  .japan-map .city text{
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; font-size:9px;
+    fill:var(--sumi); font-weight:700;
+  }
+  .japan-map-caption{ font-size:11.5px; color:var(--sumi-soft); text-align:center; max-width:340px; line-height:1.6; }
+
+  /* ---------- Dashboard: culture scroll ---------- */
+  .culture-scroll{
+    display:flex; gap:14px; overflow-x:auto; padding:4px 4px 14px; scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+  }
+  .culture-scroll::-webkit-scrollbar{ height:7px; }
+  .culture-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:999px; }
+  .culture-card{
+    flex:0 0 190px; scroll-snap-align:start;
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:16px 16px 18px;
+  }
+  .culture-icon{ font-size:28px; line-height:1; margin-bottom:10px; }
+  .culture-title{ font-weight:700; font-size:13.5px; color:var(--sumi); margin-bottom:6px; }
+  .culture-desc{ font-size:12px; color:var(--sumi-soft); line-height:1.55; }
+  .culture-desc i{ font-style:normal; color:var(--sumi); font-weight:600; }
+
+  footer{
+    position:relative; z-index:2; text-align:center; padding:26px 20px 40px;
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; color:var(--sumi-soft); letter-spacing:.04em;
+    border-top:1px solid var(--line);
+  }
+  footer .status{ margin-top:6px; }
+  footer .status .dot{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--take); margin-right:5px; vertical-align:1px; }
+  footer .status.offline .dot{ background:var(--shu); }
+
+  /* ---------- Install banner ---------- */
+  .install-btn{
+    display:none; align-items:center; gap:6px;
+  }
+  .install-btn.show{ display:inline-flex; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+
+  /* ==========================================================
+     REGISTRATION GATE
+  ========================================================== */
+  .reg-overlay{
+    position:fixed; inset:0; z-index:500;
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(182,137,47,.10), transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(38,65,92,.10), transparent 45%),
+      var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; overflow-y:auto;
+  }
+  .reg-overlay[hidden]{ display:none; }
+  .reg-card{
+    width:100%; max-width:460px; margin:auto;
+    border:1px solid var(--line); background:rgba(255,253,247,.7);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:32px 30px 28px; position:relative; z-index:2;
+    animation:rise .4s ease;
+  }
+  .reg-mark{
+    width:52px; height:52px; border-radius:50%; margin:0 auto 16px;
+    background:#fdfcf8; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(178,58,46,.08);
+  }
+  .reg-mark::before{
+    content:''; width:58%; height:58%; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #d24a3a, var(--shu) 55%, var(--shu-dark) 100%);
+  }
+  .reg-card h2{
+    margin:0 0 6px; text-align:center;
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:22px;
+  }
+  .reg-card .reg-sub{
+    margin:0 0 24px; text-align:center; font-size:13px; color:var(--sumi-soft); line-height:1.6;
+  }
+  .reg-field{ margin-bottom:15px; }
+  .reg-field label{
+    display:block; margin-bottom:6px;
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--sumi-soft);
+  }
+  .reg-field input[type="text"],
+  .reg-field input[type="number"],
+  .reg-field select{
+    width:100%; appearance:none; box-sizing:border-box;
+    border:1px solid var(--line); border-radius:6px; background:rgba(255,253,247,.85);
+    color:var(--sumi); padding:11px 13px; font-size:14px;
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif;
+  }
+  .reg-field input:focus, .reg-field select:focus{ outline:2px solid var(--ai-soft); outline-offset:1px; }
+  .reg-field select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0L5 6L10 0Z' fill='%234a463d'/></svg>");
+    background-repeat:no-repeat; background-position:right 13px center; padding-right:30px;
+  }
+  .reg-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .reg-error{
+    font-size:12px; color:var(--shu); margin:-6px 0 15px; min-height:14px;
+  }
+  .reg-card .btn{ width:100%; justify-content:center; margin-top:6px; }
+  .reg-note{
+    margin-top:16px; text-align:center; font-size:11px; color:var(--sumi-soft); line-height:1.6;
+  }
+
+  /* ==========================================================
+     TEST / QUIZ
+  ========================================================== */
+  .quiz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+  .quiz-card{
+    border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
+    padding:18px 18px 16px; display:flex; flex-direction:column; gap:10px;
+  }
+  .quiz-card.passed{ border-color:var(--take); }
+  .quiz-card-top{ display:flex; align-items:center; gap:12px; }
+  .quiz-icon{
+    width:40px; height:40px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800; font-size:17px;
+    background:radial-gradient(circle at 35% 30%, var(--kin), var(--shu) 70%); color:#fff8ee;
+  }
+  .quiz-card.passed .quiz-icon{ background:radial-gradient(circle at 35% 30%, var(--take), #3f5738 70%); }
+  .quiz-title{ font-weight:700; font-size:14.5px; color:var(--sumi); }
+  .quiz-sub{ font-size:11.5px; color:var(--sumi-soft); }
+  .quiz-desc{ font-size:12.5px; color:var(--sumi-soft); line-height:1.55; flex:1; }
+  .quiz-status{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px; letter-spacing:.05em;
+    color:var(--sumi-soft);
+  }
+  .quiz-status.passed{ color:var(--take); font-weight:700; }
+  .quiz-card .btn{ align-self:flex-start; }
+
+  .quiz-stage{
+    border:1px solid var(--line); background:rgba(255,253,247,.6); border-radius:var(--radius);
+    padding:26px 26px 24px; max-width:640px; margin-top:22px;
+  }
+  .quiz-stage-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; letter-spacing:.08em;
+    color:var(--sumi-soft); text-transform:uppercase;
+  }
+  .quiz-bar{ height:4px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:24px; }
+  .quiz-bar-fill{ height:100%; background:var(--shu); transition:width .25s ease; }
+  .quiz-question{
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:clamp(30px,6vw,46px); text-align:center; margin:6px 0 26px; color:var(--sumi); line-height:1.25;
+  }
+  .quiz-question.small{ font-size:20px; font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; font-weight:700; }
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media(max-width:520px){ .quiz-options{ grid-template-columns:1fr; } }
+  .quiz-option{
+    appearance:none; cursor:pointer; text-align:left; width:100%;
+    border:1px solid var(--line); background:rgba(255,253,247,.7); border-radius:var(--radius);
+    padding:13px 15px; font-size:14px; color:var(--sumi);
+    font-family:'Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif;
+    transition:border-color .15s, background .15s;
+  }
+  .quiz-option:hover{ border-color:var(--ai-soft); }
+  .quiz-option.selected{ border-color:var(--ai); background:rgba(38,65,92,.08); }
+  .quiz-option.correct{ border-color:var(--take); background:rgba(92,122,82,.14); }
+  .quiz-option.wrong{ border-color:var(--shu); background:rgba(178,58,46,.1); }
+  .quiz-option:disabled{ cursor:default; }
+  .quiz-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:22px; gap:12px; }
+  .quiz-feedback{ font-size:12.5px; color:var(--sumi-soft); min-height:16px; }
+
+  .quiz-result{ text-align:center; padding:10px 0; }
+  .quiz-result-score{
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:52px; color:var(--sumi); line-height:1;
+  }
+  .quiz-result-label{
+    margin-top:6px; font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .quiz-result-label.pass{ color:var(--take); }
+  .quiz-result-label.fail{ color:var(--shu); }
+  .quiz-result p{ font-size:13px; color:var(--sumi-soft); max-width:420px; margin:16px auto 22px; line-height:1.6; }
+  .quiz-result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  /* ---------- Certificate ---------- */
+  .cert-locked{
+    border:1px dashed var(--line); border-radius:var(--radius); padding:26px 22px;
+    text-align:center; color:var(--sumi-soft); font-size:13px; line-height:1.7; max-width:640px;
+  }
+  .cert-locked .progress-mini{ margin-top:14px; font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11.5px; letter-spacing:.06em; color:var(--sumi-soft); }
+  .certificate-wrap{ max-width:720px; }
+  .certificate{
+    position:relative; border:2px solid var(--kin); outline:1px solid var(--line); outline-offset:-8px;
+    background:rgba(255,253,247,.85); padding:44px 40px 38px; text-align:center; border-radius:2px;
+    box-shadow:var(--shadow);
+  }
+  .certificate::before{
+    content:''; position:absolute; inset:10px; border:1px solid rgba(182,137,47,.5); pointer-events:none;
+  }
+  .cert-seal{
+    width:74px; height:74px; border-radius:50%; margin:0 auto 14px; position:relative;
+    background:#fdfcf8; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(178,58,46,.08);
+  }
+  .cert-seal::before{
+    content:'合'; font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800; font-size:28px;
+    color:var(--shu);
+  }
+  .cert-eyebrow{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--sumi-soft); margin-bottom:4px;
+  }
+  .cert-title{
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:clamp(24px,4vw,32px); margin:2px 0 18px; color:var(--sumi);
+  }
+  .cert-body-text{ font-size:13.5px; color:var(--sumi-soft); line-height:1.8; max-width:480px; margin:0 auto; }
+  .cert-name{
+    display:block; margin:16px auto 6px; font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif;
+    font-weight:800; font-size:clamp(24px,4vw,30px); color:var(--shu-dark);
+    border-bottom:1px solid var(--line); padding-bottom:10px; max-width:400px;
+  }
+  .cert-meta{
+    display:flex; justify-content:center; gap:26px; margin-top:24px; flex-wrap:wrap;
+  }
+  .cert-meta div{ text-align:center; }
+  .cert-meta .cm-label{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--sumi-soft); }
+  .cert-meta .cm-value{ font-size:13px; font-weight:700; color:var(--sumi); margin-top:3px; }
+  .certificate-actions{ display:flex; gap:10px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+
+  @media print{
+    body *{ visibility:hidden; }
+    .certificate, .certificate *{ visibility:visible; }
+    .certificate{ position:fixed; inset:0; margin:0; border:none; outline:none; box-shadow:none; }
+    .certificate::before{ inset:16px; }
+  }
+</style>
+</head>
+<body>
+<div class="texture"></div>
+
+<div class="reg-overlay" id="regOverlay" hidden>
+  <div class="reg-card">
+    <div class="reg-mark" aria-hidden="true"></div>
+    <h2>ようこそ · Welcome</h2>
+    <p class="reg-sub">Tell us a little about yourself before you start. This stays on your device and is used for your progress and your certificate.</p>
+    <form id="regForm" novalidate>
+      <div class="reg-field">
+        <label for="regName">Full name</label>
+        <input type="text" id="regName" name="regName" autocomplete="name" placeholder="e.g. Aiko Tanaka" required>
+      </div>
+      <div class="reg-row">
+        <div class="reg-field">
+          <label for="regAge">Age</label>
+          <input type="number" id="regAge" name="regAge" min="3" max="120" placeholder="e.g. 24" required>
+        </div>
+        <div class="reg-field">
+          <label for="regGender">Gender</label>
+          <select id="regGender" name="regGender" required>
+            <option value="" disabled selected>Select…</option>
+            <option>Female</option>
+            <option>Male</option>
+            <option>Other</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div class="reg-field">
+        <label for="regCountry">Country</label>
+        <select id="regCountry" name="regCountry" required>
+          <option value="" disabled selected>Select…</option>
+        </select>
+      </div>
+      <p class="reg-error" id="regError"></p>
+      <button type="submit" class="btn primary">Start learning</button>
+    </form>
+    <p class="reg-note">🔒 Saved only on this device — never sent anywhere.</p>
+  </div>
+</div>
+
+<header>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"></div>
+    <div class="brand-text">
+      <h1>手習い <span class="flag-badge" title="Japan" aria-label="Japan flag">🇯🇵</span><span class="en">Tenarai · learn by hand</span></h1>
+    </div>
+  </div>
+  <div class="tagline">Read the kana, write the strokes, speak the sounds, look up the words — one page, four ways in.</div>
+  <button class="btn ghost small install-btn" id="installBtn">⬇ install app</button>
+  <div class="stamp-album" title="Stamps earned — saved on this device">
+    <div class="stamp-dots" id="stampDots"></div>
+    <span class="stamp-count" id="stampCount">0 stamps</span>
+  </div>
+</header>
+
+<div class="flag-strip" aria-hidden="true"></div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <nav class="side-nav">
+      <button class="tab active" data-tab="dashboard"><span class="jp">今日</span><span class="en">Dashboard</span></button>
+      <button class="tab" data-tab="read"><span class="jp">読む</span><span class="en">Read</span></button>
+      <button class="tab" data-tab="write"><span class="jp">書く</span><span class="en">Write</span></button>
+      <button class="tab" data-tab="speak"><span class="jp">話す</span><span class="en">Speak</span></button>
+      <button class="tab" data-tab="translate"><span class="jp">訳す</span><span class="en">Translate</span></button>
+      <button class="tab" data-tab="dict"><span class="jp">引く</span><span class="en">Dictionary</span></button>
+      <button class="tab" data-tab="test"><span class="jp">試験</span><span class="en">Test</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="tab" data-tab="settings"><span class="jp">設定</span><span class="en">Settings</span></button>
+    </div>
+  </aside>
+
+  <div class="content-col">
+  <main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="panel active" id="panel-dashboard">
+    <div class="section-head">
+      <p class="eyebrow">00 · Dashboard</p>
+      <h2>今日 · Today</h2>
+      <p>A new word every day, a little about Japan, and the sights worth knowing before your first trip — or your next lesson.</p>
+    </div>
+
+    <!-- Word of the day -->
+    <div class="settings-block">
+      <h3>Word of the day</h3>
+      <div class="wotd-card">
+        <div class="wotd-glyph" id="wotdGlyph">水</div>
+        <div class="wotd-info">
+          <div class="wotd-kana" id="wotdKana">みず</div>
+          <div class="wotd-romaji" id="wotdRomaji">mizu</div>
+          <div class="wotd-en" id="wotdEn">water</div>
+          <div class="wotd-example" id="wotdExample"></div>
+        </div>
+        <button class="btn ghost small" id="wotdListenBtn">🔊 listen</button>
+      </div>
+    </div>
+
+    <!-- Japan intro + facts -->
+    <div class="settings-block">
+      <h3>About Japan</h3>
+      <div class="japan-intro">
+        <div class="japan-intro-text">
+          <p>Japan (日本, <i>Nihon</i> or <i>Nippon</i>) is an island nation in East Asia made up of four main islands — Hokkaido, Honshu, Shikoku, and Kyushu — plus thousands of smaller ones stretching from subtropical Okinawa in the south to the cool north of Hokkaido.</p>
+          <p>Japanese is written with three scripts working together: hiragana and katakana, each a complete phonetic alphabet, and kanji, characters borrowed and adapted from Chinese centuries ago. Tenarai starts you on all three, one tab at a time.</p>
+        </div>
+        <div class="fact-grid">
+          <div class="fact-card"><span class="fact-label">Capital</span><span class="fact-value">Tokyo</span></div>
+          <div class="fact-card"><span class="fact-label">Population</span><span class="fact-value">~123 million</span></div>
+          <div class="fact-card"><span class="fact-label">Language</span><span class="fact-value">Japanese</span></div>
+          <div class="fact-card"><span class="fact-label">Currency</span><span class="fact-value">Yen (¥)</span></div>
+          <div class="fact-card"><span class="fact-label">Scripts</span><span class="fact-value">Hiragana · Katakana · Kanji</span></div>
+          <div class="fact-card"><span class="fact-label">Main islands</span><span class="fact-value">4 (+ thousands more)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="settings-block">
+      <h3>Japan at a glance</h3>
+      <div class="japan-map-wrap">
+        <svg class="japan-map" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stylized map of Japan showing its main islands and major cities">
+          <line x1="150" y1="18" x2="55" y2="430" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="2 6"/>
+
+          <ellipse cx="150" cy="48" rx="36" ry="28" class="island"/>
+          <text x="150" y="12" class="island-label" text-anchor="middle">HOKKAIDO</text>
+
+          <ellipse cx="112" cy="185" rx="46" ry="112" transform="rotate(-18 112 185)" class="island honshu"/>
+          <text x="185" y="150" class="island-label">HONSHU</text>
+
+          <ellipse cx="97" cy="292" rx="20" ry="13" class="island"/>
+          <text x="97" y="272" class="island-label" text-anchor="middle">SHIKOKU</text>
+
+          <ellipse cx="66" cy="322" rx="28" ry="25" class="island"/>
+          <text x="30" y="330" class="island-label" text-anchor="middle">KYUSHU</text>
+
+          <g class="island">
+            <circle cx="55" cy="400" r="4"/>
+            <circle cx="47" cy="412" r="3.4"/>
+            <circle cx="40" cy="424" r="2.8"/>
+          </g>
+          <text x="55" y="440" class="island-label" text-anchor="middle">OKINAWA</text>
+
+          <g class="city">
+            <circle cx="150" cy="50" r="3.2"/><text x="157" y="53">Sapporo</text>
+            <circle cx="128" cy="158" r="3.2"/><text x="135" y="161">Tokyo</text>
+            <circle cx="92" cy="205" r="3.2"/><text x="60" y="200">Kyoto</text>
+            <circle cx="86" cy="222" r="3.2"/><text x="52" y="234">Osaka</text>
+            <circle cx="72" cy="252" r="3.2"/><text x="30" y="255">Hiroshima</text>
+            <circle cx="63" cy="318" r="3.2"/><text x="15" y="312">Fukuoka</text>
+            <circle cx="55" cy="400" r="0"/><text x="60" y="404">Naha</text>
+          </g>
+        </svg>
+        <p class="japan-map-caption">A stylized locator, not a precise coastline — Japan's four main islands arc roughly 3,000 km from north to south.</p>
+      </div>
+    </div>
+
+    <!-- Culture scroll -->
+    <div class="settings-block">
+      <h3>Culture, a scroll at a time</h3>
+      <div class="culture-scroll" id="cultureScroll">
+        <div class="culture-card">
+          <div class="culture-icon">🌸</div>
+          <div class="culture-title">Sakura</div>
+          <div class="culture-desc">Cherry blossoms bloom for about a week each spring — crowds gather for <i>hanami</i> picnics under the trees.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">⛩️</div>
+          <div class="culture-title">Shrines &amp; temples</div>
+          <div class="culture-desc">Shinto shrines with red torii gates and Buddhist temples sit side by side across almost every town.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🍵</div>
+          <div class="culture-title">Tea ceremony</div>
+          <div class="culture-desc"><i>Sadou</i> (茶道) turns preparing matcha into a slow ritual of precision, respect, and calm.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🍣</div>
+          <div class="culture-title">Cuisine</div>
+          <div class="culture-desc">From sushi and ramen to regional specialties, food culture changes with the season and the map.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🎏</div>
+          <div class="culture-title">Festivals</div>
+          <div class="culture-desc">Local <i>matsuri</i> fill streets with lanterns, drums, and fireworks throughout the year.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🗻</div>
+          <div class="culture-title">Mount Fuji</div>
+          <div class="culture-desc">Japan's tallest peak, and a lasting symbol of the country visible from Tokyo on a clear day.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🥋</div>
+          <div class="culture-title">Martial arts</div>
+          <div class="culture-desc">Judo, karate, kendo, and sumo carry centuries of discipline, etiquette, and tradition.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">👘</div>
+          <div class="culture-title">Kimono</div>
+          <div class="culture-desc">Traditional dress still worn today for ceremonies, festivals, and special occasions.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🚄</div>
+          <div class="culture-title">Shinkansen</div>
+          <div class="culture-desc">The bullet train network connects cities at up to 320 km/h — and it's famous for running on time.</div>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🎮</div>
+          <div class="culture-title">Pop culture</div>
+          <div class="culture-desc">Anime, manga, and video games are among Japan's best-known cultural exports worldwide.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ READ ============ -->
+  <section class="panel" id="panel-read">
+    <div class="section-head">
+      <p class="eyebrow">01 · Reading</p>
+      <h2>Hiragana, katakana, and the first kanji</h2>
+      <p>Tap any character to hear it spoken aloud. Hiragana carries native words and grammar; katakana carries loanwords and emphasis; kanji carries meaning. Getting through all three charts once earns a stamp. Your progress (✓) is saved on this device.</p>
+    </div>
+
+    <div class="script-toggle">
+      <button class="active" data-script="hira">ひらがな Hiragana</button>
+      <button data-script="kata">カタカナ Katakana</button>
+    </div>
+
+    <div class="kana-groups" id="kanaGroups"></div>
+
+    <div class="kanji-strip">
+      <p class="kana-group-title">First 20 kanji · N5</p>
+      <div class="kanji-grid" id="kanjiGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ WRITE ============ -->
+  <section class="panel" id="panel-write">
+    <div class="section-head">
+      <p class="eyebrow">02 · Writing</p>
+      <h2>Trace it on the manuscript grid</h2>
+      <p>Genkōyōshi — the squared paper Japanese students have used for a century — keeps every character the same size. Trace the faint guide, then draw it again from memory below.</p>
+    </div>
+
+    <div class="write-layout">
+      <div class="write-target">
+        <div class="genko">
+          <canvas id="writeCanvas" width="260" height="260"></canvas>
+        </div>
+        <div class="write-meta">
+          <div class="romaji" id="writeRomaji">a</div>
+          <div class="mean" id="writeMean"></div>
+        </div>
+        <div class="write-controls">
+          <button class="btn ghost" id="btnClearCanvas">clear</button>
+          <button class="btn ghost" id="btnGuide">toggle guide</button>
+          <button class="btn primary" id="btnGotIt">✓ check my writing</button>
+          <button class="btn" id="btnNextChar" disabled>next →</button>
+        </div>
+        <div class="write-feedback" id="writeFeedback"></div>
+      </div>
+
+      <div>
+        <div class="write-pool">
+          <div class="pool-row">
+            <label>script</label>
+            <button class="pool-btn on" data-pool="hira">hiragana</button>
+            <button class="pool-btn on" data-pool="kata">katakana</button>
+            <button class="pool-btn" data-pool="kanji">kanji (N5)</button>
+          </div>
+        </div>
+        <div class="write-tip">
+          <b>How to trace well:</b> keep strokes in the same order every time — top to bottom, left to right, and horizontal before vertical when the two cross. Order matters more than speed; it's what makes the character legible when written quickly later.
+          <br><br>
+          <b>Checking your writing:</b> press <b>✓ check my writing</b> and the app compares your ink against the character's shape and position on the grid. Get a close enough match and <b>next →</b> unlocks; otherwise clear and try again. It's a shape check, not full handwriting recognition — use your own judgment too.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPEAK ============ -->
+  <section class="panel" id="panel-speak">
+    <div class="section-head">
+      <p class="eyebrow">03 · Speaking</p>
+      <h2>Listen, then say it back</h2>
+      <p>Press listen to hear each phrase at a natural pace, then press the microphone and repeat it. Your browser checks what it heard against the phrase — a loose match is enough.</p>
+    </div>
+    <div class="phrase-list" id="phraseList"></div>
+    <div class="speech-warning" id="speechWarning">
+      Speech recognition isn't available in this browser/embed. You can still use <b>Listen</b> to hear correct pronunciation — open this page in a standalone browser tab (Chrome desktop or Android) to unlock the microphone practice.
+    </div>
+  </section>
+
+  <!-- ============ TRANSLATE ============ -->
+  <section class="panel" id="panel-translate">
+    <div class="section-head">
+      <p class="eyebrow">04 · Translate</p>
+      <h2>Speak one language, hear the other</h2>
+      <p>Choose which language you're about to speak, press the mic, and say a word or sentence. It's recognized, translated, and spoken back automatically — English in becomes spoken Japanese, and Japanese in becomes spoken English. This needs an internet connection for the translation step; everything else on this page still works offline.</p>
+    </div>
+
+    <div class="script-toggle" id="translateDirToggle">
+      <button class="active" data-dir="en-ja">🇬🇧 I'm speaking English</button>
+      <button data-dir="ja-en">🇯🇵 日本語で話します</button>
+    </div>
+
+    <div class="translate-mic-wrap">
+      <button class="btn primary mic-btn big" id="translateMicBtn" title="press and speak">🎙</button>
+      <div class="dict-mic-hint" id="translateMicHint"></div>
+    </div>
+
+    <div class="translate-result" id="translateResult">
+      <div class="translate-line">
+        <span class="translate-label">you said</span>
+        <span id="translateOriginal"></span>
+        <button class="btn ghost small" id="replayOriginal">🔊</button>
+      </div>
+      <div class="translate-arrow">↓ translated ↓</div>
+      <div class="translate-line">
+        <span class="translate-label">translation</span>
+        <span id="translateResultText"></span>
+        <button class="btn ghost small" id="replayTranslation">🔊</button>
+      </div>
+    </div>
+
+    <p class="translate-history-title" id="translateHistoryTitle" style="display:none;">recent translations</p>
+    <div class="translate-history" id="translateHistory"></div>
+  </section>
+
+  <!-- ============ DICTIONARY ============ -->
+  <section class="panel" id="panel-dict">
+    <div class="section-head">
+      <p class="eyebrow">05 · Dictionary</p>
+      <h2>Look a word up</h2>
+      <p>Search in English, rōmaji, kana, or kanji — or press 🎙 and say a word in Japanese to have it recognized and translated. This checks a live dictionary API first when you're online, and always shows matches from a built-in word list too — so lookups still work offline. Tap ☆ to save a word; saved words and recent searches stay on this device.</p>
+    </div>
+    <div class="dict-search">
+      <input type="text" id="dictInput" placeholder="try: water · みず · mizu · 水" autocomplete="off">
+      <button class="btn mic-btn" id="dictMicBtn" title="speak a Japanese word to look it up">🎙</button>
+      <button class="btn primary" id="dictSearchBtn">引く search</button>
+    </div>
+    <div class="dict-mic-hint" id="dictMicHint"></div>
+    <div class="dict-history" id="dictHistory"></div>
+    <div class="dict-status" id="dictStatus"></div>
+    <div class="dict-results" id="dictResults"></div>
+  </section>
+
+  <!-- ============ TEST ============ -->
+  <section class="panel" id="panel-test">
+    <div class="section-head">
+      <p class="eyebrow">06 · Test</p>
+      <h2>試験 · Test what you've learned</h2>
+      <p>Four short quizzes, pulled from the kana, kanji, vocabulary, and phrases you've already seen. Pass all four with 70% or higher to earn your certificate.</p>
+    </div>
+
+    <div class="quiz-grid" id="quizGrid"></div>
+
+    <div class="quiz-stage" id="quizStage" style="display:none;"></div>
+
+    <div class="settings-block" style="margin-top:34px;">
+      <h3>Certificate</h3>
+      <div id="certArea"></div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="panel" id="panel-settings">
+    <div class="section-head">
+      <p class="eyebrow">07 · Settings</p>
+      <h2>Make it yours</h2>
+      <p>Pick a color theme for the app. Your choice is saved on this device.</p>
+    </div>
+
+    <div class="settings-block">
+      <h3>Profile</h3>
+      <div class="dev-card">
+        <div class="dev-avatar" id="profileAvatar" aria-hidden="true">?</div>
+        <div class="dev-info">
+          <div class="dev-name" id="profileName">—</div>
+          <div class="dev-email" id="profileMeta">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <h3>Notifications</h3>
+      <div class="notify-card">
+        <div class="notify-row">
+          <div>
+            <div class="notify-title">🔔 Daily word of the day</div>
+            <div class="notify-status" id="notifyStatus">Checking…</div>
+          </div>
+          <button class="btn primary small" id="notifyToggleBtn">Enable</button>
+        </div>
+        <p class="notify-note" id="notifyNote"></p>
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <h3>Color theme</h3>
+      <div class="theme-grid" id="themeGrid">
+        <button class="theme-swatch" data-theme="paper">
+          <span class="dots"><i style="background:#b23a2e"></i><i style="background:#f6f1e4;border:1px solid rgba(33,31,26,.2)"></i></span>
+          <span class="name">Vermillion</span>
+        </button>
+        <button class="theme-swatch" data-theme="indigo">
+          <span class="dots"><i style="background:#26415c"></i><i style="background:#f6f1e4;border:1px solid rgba(33,31,26,.2)"></i></span>
+          <span class="name">Indigo</span>
+        </button>
+        <button class="theme-swatch" data-theme="bamboo">
+          <span class="dots"><i style="background:#5c7a52"></i><i style="background:#f6f1e4;border:1px solid rgba(33,31,26,.2)"></i></span>
+          <span class="name">Bamboo</span>
+        </button>
+        <button class="theme-swatch" data-theme="sakura">
+          <span class="dots"><i style="background:#cf5b78"></i><i style="background:#fbf1ef;border:1px solid rgba(33,31,26,.2)"></i></span>
+          <span class="name">Sakura</span>
+        </button>
+        <button class="theme-swatch" data-theme="gold">
+          <span class="dots"><i style="background:#b6892f"></i><i style="background:#f6f1e4;border:1px solid rgba(33,31,26,.2)"></i></span>
+          <span class="name">Gold</span>
+        </button>
+        <button class="theme-swatch" data-theme="sumi">
+          <span class="dots"><i style="background:#d24a3a"></i><i style="background:#201e1a"></i></span>
+          <span class="name">Sumi (dark)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <h3>About</h3>
+      <div class="dev-card">
+        <div class="dev-avatar" aria-hidden="true">L</div>
+        <div class="dev-info">
+          <div class="dev-name">Developed by LEMON_DEV</div>
+          <div class="dev-email"><a href="mailto:zeromel762@gmail.com">zeromel762@gmail.com</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <footer>
+    🇯🇵 手習い — a page for reading, writing, speaking, and looking up Japanese. Pronunciation via your browser's speech engine.
+    <div class="status" id="onlineStatus"><span class="dot"></span><span id="onlineStatusText">online</span></div>
+  </footer>
+
+  </div>
+</div>
+
+<div class="stamp-burst" id="stampBurst"><span class="big">良</span><span class="small">stamp earned</span></div>
+
+<script>
+/* =========================================================
+   DATA
+========================================================= */
+// Base hiragana + romaji. Katakana is derived by shifting each
+// character's codepoint by 0x60 (あ U+3042 -> ア U+30A2), which
+// holds across this entire block including dakuten/handakuten.
+function toKatakana(hira){
+  return hira.split('').map(ch=>{
+    const code = ch.charCodeAt(0);
+    if(code >= 0x3041 && code <= 0x3096) return String.fromCharCode(code + 0x60);
+    return ch;
+  }).join('');
+}
+
+const HIRA_ROWS = [
+  { title:'a · i · u · e · o', cells:[['あ','a'],['い','i'],['う','u'],['え','e'],['お','o']] },
+  { title:'k',  cells:[['か','ka'],['き','ki'],['く','ku'],['け','ke'],['こ','ko']] },
+  { title:'s',  cells:[['さ','sa'],['し','shi'],['す','su'],['せ','se'],['そ','so']] },
+  { title:'t',  cells:[['た','ta'],['ち','chi'],['つ','tsu'],['て','te'],['と','to']] },
+  { title:'n',  cells:[['な','na'],['に','ni'],['ぬ','nu'],['ね','ne'],['の','no']] },
+  { title:'h',  cells:[['は','ha'],['ひ','hi'],['ふ','fu'],['へ','he'],['ほ','ho']] },
+  { title:'m',  cells:[['ま','ma'],['み','mi'],['む','mu'],['め','me'],['も','mo']] },
+  { title:'y',  cells:[['や','ya'],null,['ゆ','yu'],null,['よ','yo']] },
+  { title:'r',  cells:[['ら','ra'],['り','ri'],['る','ru'],['れ','re'],['ろ','ro']] },
+  { title:'w · n', cells:[['わ','wa'],null,null,null,['を','wo']] },
+];
+const HIRA_N = ['ん','n'];
+const DAKU_ROWS = [
+  { title:'g', cells:[['が','ga'],['ぎ','gi'],['ぐ','gu'],['げ','ge'],['ご','go']] },
+  { title:'z', cells:[['ざ','za'],['じ','ji'],['ず','zu'],['ぜ','ze'],['ぞ','zo']] },
+  { title:'d', cells:[['だ','da'],['ぢ','ji'],['づ','zu'],['で','de'],['ど','do']] },
+  { title:'b', cells:[['ば','ba'],['び','bi'],['ぶ','bu'],['べ','be'],['ぼ','bo']] },
+  { title:'p', cells:[['ぱ','pa'],['ぴ','pi'],['ぷ','pu'],['ぺ','pe'],['ぽ','po']] },
+];
+
+const KANJI_LIST = [
+  {k:'日',on:'ニチ・ジツ',kun:'ひ・-び',mean:'day, sun'},
+  {k:'一',on:'イチ',kun:'ひと-',mean:'one'},
+  {k:'二',on:'ニ',kun:'ふた-',mean:'two'},
+  {k:'三',on:'サン',kun:'みっ-',mean:'three'},
+  {k:'人',on:'ジン・ニン',kun:'ひと',mean:'person'},
+  {k:'月',on:'ゲツ・ガツ',kun:'つき',mean:'month, moon'},
+  {k:'火',on:'カ',kun:'ひ',mean:'fire'},
+  {k:'水',on:'スイ',kun:'みず',mean:'water'},
+  {k:'木',on:'ボク・モク',kun:'き',mean:'tree, wood'},
+  {k:'金',on:'キン',kun:'かね',mean:'gold, money'},
+  {k:'土',on:'ド',kun:'つち',mean:'earth, soil'},
+  {k:'山',on:'サン',kun:'やま',mean:'mountain'},
+  {k:'川',on:'セン',kun:'かわ',mean:'river'},
+  {k:'女',on:'ジョ',kun:'おんな',mean:'woman'},
+  {k:'子',on:'シ',kun:'こ',mean:'child'},
+  {k:'大',on:'ダイ・タイ',kun:'おお-',mean:'big'},
+  {k:'小',on:'ショウ',kun:'ちい-さい',mean:'small'},
+  {k:'中',on:'チュウ',kun:'なか',mean:'inside, middle'},
+  {k:'本',on:'ホン',kun:'もと',mean:'book, origin'},
+  {k:'学',on:'ガク',kun:'まな-ぶ',mean:'study, learning'},
+];
+
+const PHRASES = [
+  // Greetings
+  {cat:'Greetings', jp:'こんにちは', romaji:'konnichiwa', en:'hello / good afternoon'},
+  {cat:'Greetings', jp:'おはようございます', romaji:'ohayou gozaimasu', en:'good morning (polite)'},
+  {cat:'Greetings', jp:'こんばんは', romaji:'konbanwa', en:'good evening'},
+  {cat:'Greetings', jp:'おやすみなさい', romaji:'oyasumi nasai', en:'good night'},
+  {cat:'Greetings', jp:'ありがとうございます', romaji:'arigatou gozaimasu', en:'thank you (polite)'},
+  {cat:'Greetings', jp:'すみません', romaji:'sumimasen', en:'excuse me / sorry'},
+  {cat:'Greetings', jp:'はじめまして', romaji:'hajimemashite', en:'nice to meet you'},
+  {cat:'Greetings', jp:'さようなら', romaji:'sayounara', en:'goodbye'},
+  // Everyday
+  {cat:'Everyday', jp:'わたしは学生です', romaji:'watashi wa gakusei desu', en:'I am a student'},
+  {cat:'Everyday', jp:'これは本です', romaji:'kore wa hon desu', en:'this is a book'},
+  {cat:'Everyday', jp:'げんきですか', romaji:'genki desu ka', en:'how are you?'},
+  {cat:'Everyday', jp:'おなまえは', romaji:'onamae wa', en:'what is your name?'},
+  {cat:'Everyday', jp:'だいじょうぶです', romaji:'daijoubu desu', en:"I'm fine / it's okay"},
+  {cat:'Everyday', jp:'わかりました', romaji:'wakarimashita', en:'understood / got it'},
+  {cat:'Everyday', jp:'わかりません', romaji:'wakarimasen', en:"I don't understand"},
+  // Questions
+  {cat:'Questions', jp:'これはなんですか', romaji:'kore wa nan desu ka', en:'what is this?'},
+  {cat:'Questions', jp:'いくらですか', romaji:'ikura desu ka', en:'how much is it?'},
+  {cat:'Questions', jp:'どこですか', romaji:'doko desu ka', en:'where is it?'},
+  {cat:'Questions', jp:'なんじですか', romaji:'nanji desu ka', en:'what time is it?'},
+  {cat:'Questions', jp:'トイレはどこですか', romaji:'toire wa doko desu ka', en:'where is the bathroom?'},
+  {cat:'Questions', jp:'えきはどこですか', romaji:'eki wa doko desu ka', en:'where is the station?'},
+  // Out and about
+  {cat:'Out & about', jp:'みずをください', romaji:'mizu wo kudasai', en:'water, please'},
+  {cat:'Out & about', jp:'これをください', romaji:'kore wo kudasai', en:'this one, please'},
+  {cat:'Out & about', jp:'おいしいです', romaji:'oishii desu', en:"it's delicious"},
+  {cat:'Out & about', jp:'がんばって', romaji:'ganbatte', en:'good luck / do your best'},
+  // Numbers
+  {cat:'Numbers', jp:'いち', romaji:'ichi', en:'one'},
+  {cat:'Numbers', jp:'に', romaji:'ni', en:'two'},
+  {cat:'Numbers', jp:'さん', romaji:'san', en:'three'},
+  {cat:'Numbers', jp:'よん', romaji:'yon', en:'four'},
+  {cat:'Numbers', jp:'ご', romaji:'go', en:'five'},
+];
+
+const LOCAL_DICTIONARY = [
+  {jp:'水',kana:'みず',romaji:'mizu',en:'water'},
+  {jp:'火',kana:'ひ',romaji:'hi',en:'fire'},
+  {jp:'食べる',kana:'たべる',romaji:'taberu',en:'to eat'},
+  {jp:'飲む',kana:'のむ',romaji:'nomu',en:'to drink'},
+  {jp:'行く',kana:'いく',romaji:'iku',en:'to go'},
+  {jp:'来る',kana:'くる',romaji:'kuru',en:'to come'},
+  {jp:'見る',kana:'みる',romaji:'miru',en:'to see, to watch'},
+  {jp:'聞く',kana:'きく',romaji:'kiku',en:'to listen, to ask'},
+  {jp:'話す',kana:'はなす',romaji:'hanasu',en:'to speak'},
+  {jp:'読む',kana:'よむ',romaji:'yomu',en:'to read'},
+  {jp:'書く',kana:'かく',romaji:'kaku',en:'to write'},
+  {jp:'学校',kana:'がっこう',romaji:'gakkou',en:'school'},
+  {jp:'先生',kana:'せんせい',romaji:'sensei',en:'teacher'},
+  {jp:'学生',kana:'がくせい',romaji:'gakusei',en:'student'},
+  {jp:'友達',kana:'ともだち',romaji:'tomodachi',en:'friend'},
+  {jp:'家族',kana:'かぞく',romaji:'kazoku',en:'family'},
+  {jp:'今日',kana:'きょう',romaji:'kyou',en:'today'},
+  {jp:'明日',kana:'あした',romaji:'ashita',en:'tomorrow'},
+  {jp:'昨日',kana:'きのう',romaji:'kinou',en:'yesterday'},
+  {jp:'ありがとう',kana:'ありがとう',romaji:'arigatou',en:'thank you'},
+  {jp:'こんにちは',kana:'こんにちは',romaji:'konnichiwa',en:'hello / good afternoon'},
+  {jp:'おはよう',kana:'おはよう',romaji:'ohayou',en:'good morning'},
+  {jp:'さようなら',kana:'さようなら',romaji:'sayounara',en:'goodbye'},
+  {jp:'すみません',kana:'すみません',romaji:'sumimasen',en:'excuse me / sorry'},
+  {jp:'はい',kana:'はい',romaji:'hai',en:'yes'},
+  {jp:'いいえ',kana:'いいえ',romaji:'iie',en:'no'},
+  {jp:'名前',kana:'なまえ',romaji:'namae',en:'name'},
+  {jp:'時間',kana:'じかん',romaji:'jikan',en:'time'},
+  {jp:'電話',kana:'でんわ',romaji:'denwa',en:'telephone'},
+  {jp:'猫',kana:'ねこ',romaji:'neko',en:'cat'},
+  {jp:'犬',kana:'いぬ',romaji:'inu',en:'dog'},
+  {jp:'本',kana:'ほん',romaji:'hon',en:'book'},
+  {jp:'車',kana:'くるま',romaji:'kuruma',en:'car'},
+  {jp:'食べ物',kana:'たべもの',romaji:'tabemono',en:'food'},
+  {jp:'大きい',kana:'おおきい',romaji:'ookii',en:'big'},
+  {jp:'小さい',kana:'ちいさい',romaji:'chiisai',en:'small'},
+  {jp:'好き',kana:'すき',romaji:'suki',en:'liked, favorite'},
+  {jp:'元気',kana:'げんき',romaji:'genki',en:'energetic, well'},
+  {jp:'仕事',kana:'しごと',romaji:'shigoto',en:'job, work'},
+  {jp:'言葉',kana:'ことば',romaji:'kotoba',en:'word, language'},
+  {jp:'毎日',kana:'まいにち',romaji:'mainichi',en:'every day'},
+];
+
+const WORD_OF_DAY_POOL = [
+  {jp:'水', kana:'みず', romaji:'mizu', en:'water', ex:'水をください。', exEn:'Water, please.'},
+  {jp:'火', kana:'ひ', romaji:'hi', en:'fire', ex:'火に気をつけて。', exEn:'Be careful with fire.'},
+  {jp:'食べる', kana:'たべる', romaji:'taberu', en:'to eat', ex:'朝ごはんを食べる。', exEn:'I eat breakfast.'},
+  {jp:'飲む', kana:'のむ', romaji:'nomu', en:'to drink', ex:'お茶を飲みます。', exEn:'I drink tea.'},
+  {jp:'友達', kana:'ともだち', romaji:'tomodachi', en:'friend', ex:'彼は私の友達です。', exEn:'He is my friend.'},
+  {jp:'家族', kana:'かぞく', romaji:'kazoku', en:'family', ex:'家族と話す。', exEn:'I talk with my family.'},
+  {jp:'今日', kana:'きょう', romaji:'kyou', en:'today', ex:'今日は晴れです。', exEn:"It's sunny today."},
+  {jp:'明日', kana:'あした', romaji:'ashita', en:'tomorrow', ex:'明日、会いましょう。', exEn:"Let's meet tomorrow."},
+  {jp:'先生', kana:'せんせい', romaji:'sensei', en:'teacher', ex:'先生におはようと言う。', exEn:'I say good morning to the teacher.'},
+  {jp:'学生', kana:'がくせい', romaji:'gakusei', en:'student', ex:'私は学生です。', exEn:'I am a student.'},
+  {jp:'猫', kana:'ねこ', romaji:'neko', en:'cat', ex:'猫がすきです。', exEn:'I like cats.'},
+  {jp:'犬', kana:'いぬ', romaji:'inu', en:'dog', ex:'犬と歩く。', exEn:'I walk with the dog.'},
+  {jp:'本', kana:'ほん', romaji:'hon', en:'book', ex:'これは本です。', exEn:'This is a book.'},
+  {jp:'食べ物', kana:'たべもの', romaji:'tabemono', en:'food', ex:'食べ物がおいしい。', exEn:'The food is delicious.'},
+  {jp:'元気', kana:'げんき', romaji:'genki', en:'energetic, well', ex:'げんきですか。', exEn:'How are you?'},
+  {jp:'仕事', kana:'しごと', romaji:'shigoto', en:'job, work', ex:'仕事に行く。', exEn:'I go to work.'},
+  {jp:'言葉', kana:'ことば', romaji:'kotoba', en:'word, language', ex:'新しい言葉を学ぶ。', exEn:'I learn a new word.'},
+  {jp:'毎日', kana:'まいにち', romaji:'mainichi', en:'every day', ex:'毎日、日本語を練習する。', exEn:'I practice Japanese every day.'},
+  {jp:'見る', kana:'みる', romaji:'miru', en:'to see, to watch', ex:'映画を見る。', exEn:'I watch a movie.'},
+  {jp:'話す', kana:'はなす', romaji:'hanasu', en:'to speak', ex:'日本語を話す。', exEn:'I speak Japanese.'},
+];
+
+/* =========================================================
+   LOCAL STORAGE — safe wrapper (falls back to memory if unavailable)
+========================================================= */
+const memoryStore = {};
+let storageWorks = true;
+try{
+  const testKey = '__tenarai_test__';
+  localStorage.setItem(testKey, '1');
+  localStorage.removeItem(testKey);
+}catch(e){ storageWorks = false; }
+
+const store = {
+  get(key, fallback){
+    try{
+      if(storageWorks){
+        const raw = localStorage.getItem('tenarai:'+key);
+        return raw === null ? fallback : JSON.parse(raw);
+      }
+    }catch(e){}
+    return Object.prototype.hasOwnProperty.call(memoryStore,key) ? memoryStore[key] : fallback;
+  },
+  set(key, value){
+    memoryStore[key] = value;
+    try{
+      if(storageWorks) localStorage.setItem('tenarai:'+key, JSON.stringify(value));
+    }catch(e){}
+  }
+};
+
+if(!storageWorks){
+  const note = document.createElement('div');
+  note.style.cssText = "font-size:11px;color:var(--sumi-soft);text-align:center;padding:6px 12px;border-bottom:1px solid var(--line);font-family:'SFMono-Regular','Consolas','Menlo',monospace;";
+  note.textContent = 'Note: this preview can\'t save progress. Download the file and open it directly in a browser to keep your stamps and history.';
+  document.body.insertBefore(note, document.body.firstChild);
+}
+
+/* =========================================================
+   STAMP ALBUM (signature interaction) — persisted
+========================================================= */
+const STAMP_TARGET = 8;
+const savedStampFlags = store.get('stampFlags', {});
+let stampCount = store.get('stampCount', 0);
+const stampDots = document.getElementById('stampDots');
+const stampCountEl = document.getElementById('stampCount');
+for(let i=0;i<STAMP_TARGET;i++){
+  const d = document.createElement('div');
+  d.className = 'stamp-dot';
+  if(i < stampCount) d.classList.add('filled');
+  stampDots.appendChild(d);
+}
+stampCountEl.textContent = stampCount + ' stamp' + (stampCount===1?'':'s');
+
+function awardStamp(label, flagKey){
+  if(flagKey){
+    if(savedStampFlags[flagKey]) return; // already awarded, persisted
+    savedStampFlags[flagKey] = true;
+    store.set('stampFlags', savedStampFlags);
+  }
+  if(stampCount < STAMP_TARGET){
+    stampCount++;
+    store.set('stampCount', stampCount);
+    const dots = stampDots.querySelectorAll('.stamp-dot');
+    dots[stampCount-1].classList.add('filled');
+  }
+  stampCountEl.textContent = stampCount + ' stamp' + (stampCount===1?'':'s');
+  const burst = document.getElementById('stampBurst');
+  burst.querySelector('.small').textContent = label || 'stamp earned';
+  burst.classList.remove('fire');
+  void burst.offsetWidth; // restart animation
+  burst.classList.add('fire');
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+document.querySelectorAll('.tab').forEach(tab=>{
+  function handleTabClick(){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    closeSidebar();
+  }
+  tab.addEventListener('click', handleTabClick);
+  tab.addEventListener('touchend', (e)=>{
+    e.preventDefault();
+    handleTabClick();
+  });
+});
+
+/* =========================================================
+   SIDEBAR — mobile: slide-in drawer. desktop: collapse/expand.
+========================================================= */
+const sidebarEl = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const appShellEl = document.querySelector('.app-shell');
+const menuBtn = document.getElementById('menuBtn');
+const isMobile = ()=> window.matchMedia('(max-width:900px)').matches;
+
+function openSidebar(){
+  sidebarEl.classList.add('open');
+  sidebarOverlay.classList.add('show');
+  menuBtn.setAttribute('aria-expanded','true');
+}
+function closeSidebar(){
+  sidebarEl.classList.remove('open');
+  sidebarOverlay.classList.remove('show');
+  if(!isMobile() && !appShellEl.classList.contains('sidebar-hidden')){
+    menuBtn.setAttribute('aria-expanded','true');
+  }else{
+    menuBtn.setAttribute('aria-expanded','false');
+  }
+}
+
+// Desktop: remembers hidden/shown state across visits.
+const savedSidebarHidden = store.get('sidebarHidden', false);
+if(!isMobile() && savedSidebarHidden){
+  appShellEl.classList.add('sidebar-hidden');
+}
+menuBtn.setAttribute('aria-expanded', String(!(!isMobile() && savedSidebarHidden)));
+
+function handleMenuClick(){
+  if(isMobile()){
+    sidebarEl.classList.contains('open') ? closeSidebar() : openSidebar();
+  }else{
+    const nowHidden = appShellEl.classList.toggle('sidebar-hidden');
+    menuBtn.setAttribute('aria-expanded', String(!nowHidden));
+    store.set('sidebarHidden', nowHidden);
+  }
+}
+menuBtn.addEventListener('click', handleMenuClick);
+menuBtn.addEventListener('touchend', (e)=>{
+  e.preventDefault();
+  handleMenuClick();
+});
+sidebarOverlay.addEventListener('click', closeSidebar);
+sidebarOverlay.addEventListener('touchend', (e)=>{
+  e.preventDefault();
+  closeSidebar();
+});
+window.addEventListener('resize', ()=>{
+  if(!isMobile()){ sidebarEl.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
+});
+
+/* =========================================================
+   COLOR THEME — persisted
+========================================================= */
+const THEMES = ['paper','indigo','bamboo','sakura','gold','sumi'];
+function applyTheme(theme){
+  if(theme === 'paper'){
+    document.documentElement.removeAttribute('data-theme');
+  }else{
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+  document.querySelectorAll('.theme-swatch').forEach(sw=>{
+    sw.classList.toggle('active', sw.dataset.theme === theme);
+  });
+  store.set('theme', theme);
+}
+const savedTheme = store.get('theme', 'paper');
+applyTheme(THEMES.includes(savedTheme) ? savedTheme : 'paper');
+document.querySelectorAll('.theme-swatch').forEach(sw=>{
+  sw.addEventListener('click', ()=> applyTheme(sw.dataset.theme));
+});
+
+/* =========================================================
+   SPEECH SYNTHESIS (listen)
+========================================================= */
+let jaVoice = null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  jaVoice = voices.find(v=> v.lang && v.lang.toLowerCase().startsWith('ja')) || null;
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speakJapanese(text){
+  if(!('speechSynthesis' in window)){
+    alert('This browser has no built-in speech synthesis, so audio playback is unavailable here.');
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ja-JP';
+  if(jaVoice) utter.voice = jaVoice;
+  utter.rate = 0.82;
+  speechSynthesis.speak(utter);
+}
+
+/* =========================================================
+   DASHBOARD — word of the day
+========================================================= */
+function todaysWord(){
+  const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+  const idx = ((daysSinceEpoch % WORD_OF_DAY_POOL.length) + WORD_OF_DAY_POOL.length) % WORD_OF_DAY_POOL.length;
+  return WORD_OF_DAY_POOL[idx];
+}
+const wotd = todaysWord();
+document.getElementById('wotdGlyph').textContent = wotd.jp;
+document.getElementById('wotdKana').textContent = wotd.kana;
+document.getElementById('wotdRomaji').textContent = wotd.romaji;
+document.getElementById('wotdEn').textContent = wotd.en;
+document.getElementById('wotdExample').innerHTML = wotd.ex + '<span class="en">— ' + wotd.exEn + '</span>';
+document.getElementById('wotdListenBtn').addEventListener('click', ()=> speakJapanese(wotd.jp));
+
+/* =========================================================
+   NOTIFICATIONS — daily word of the day, on phone and browser.
+   Uses the service worker so the notification can be shown even
+   when the app isn't the focused tab (and, once installed, can
+   fire from the background on platforms that support Periodic
+   Background Sync). Everywhere else, it checks once per app open
+   and shows that day's word if it hasn't been shown yet.
+========================================================= */
+const notifyStatusEl = document.getElementById('notifyStatus');
+const notifyNoteEl = document.getElementById('notifyNote');
+const notifyToggleBtn = document.getElementById('notifyToggleBtn');
+const notifySupported = ('Notification' in window) && ('serviceWorker' in navigator);
+
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+function refreshNotifyUI(){
+  if(!notifySupported){
+    notifyStatusEl.textContent = 'Not supported in this browser.';
+    notifyStatusEl.className = 'notify-status off';
+    notifyToggleBtn.disabled = true;
+    notifyToggleBtn.textContent = 'Unavailable';
+    notifyNoteEl.textContent = 'Try a Chromium browser (Chrome, Edge), or install the app to your home screen.';
+    return;
+  }
+  const enabled = store.get('notifyEnabled', false) && Notification.permission === 'granted';
+  if(Notification.permission === 'denied'){
+    notifyStatusEl.textContent = 'Blocked — allow notifications for this site in your browser settings.';
+    notifyStatusEl.className = 'notify-status off';
+    notifyToggleBtn.textContent = 'Enable';
+  }else if(enabled){
+    notifyStatusEl.textContent = "On — you'll get today's word once a day.";
+    notifyStatusEl.className = 'notify-status on';
+    notifyToggleBtn.textContent = 'Turn off';
+  }else{
+    notifyStatusEl.textContent = 'Off.';
+    notifyStatusEl.className = 'notify-status';
+    notifyToggleBtn.textContent = 'Enable';
+  }
+  notifyToggleBtn.disabled = false;
+  notifyNoteEl.textContent = "Checks once per visit and shows that day's word here in the browser. Install this app to your phone or desktop for it to also appear as a system notification in the background (fullest support on Android/Chrome/Edge; on iPhone, add to home screen first from Safari's share menu).";
+}
+
+async function checkAndNotifyToday(){
+  if(!notifySupported) return;
+  if(Notification.permission !== 'granted') return;
+  if(!store.get('notifyEnabled', false)) return;
+  if(store.get('lastNotifiedDay', '') === todayKey()) return;
+  const reg = await navigator.serviceWorker.ready;
+  if(reg.active) reg.active.postMessage({ type:'SHOW_WORD_OF_DAY' });
+  store.set('lastNotifiedDay', todayKey());
+}
+
+async function tryRegisterPeriodicSync(){
+  try{
+    const reg = await navigator.serviceWorker.ready;
+    if('periodicSync' in reg && navigator.permissions){
+      const status = await navigator.permissions.query({ name:'periodic-background-sync' });
+      if(status.state === 'granted'){
+        await reg.periodicSync.register('tenarai-word-of-day', { minInterval: 20*60*60*1000 });
+      }
+    }
+  }catch(e){ /* unsupported here — the per-visit check above still covers it */ }
+}
+
+notifyToggleBtn.addEventListener('click', async ()=>{
+  if(!notifySupported) return;
+  const currentlyOn = store.get('notifyEnabled', false) && Notification.permission === 'granted';
+  if(currentlyOn){
+    store.set('notifyEnabled', false);
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      if('periodicSync' in reg) await reg.periodicSync.unregister('tenarai-word-of-day');
+    }catch(e){}
+    refreshNotifyUI();
+    return;
+  }
+  const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if(perm === 'granted'){
+    store.set('notifyEnabled', true);
+    await tryRegisterPeriodicSync();
+    await checkAndNotifyToday();
+  }
+  refreshNotifyUI();
+});
+
+if(notifySupported){
+  refreshNotifyUI();
+  navigator.serviceWorker.ready.then(()=>{
+    checkAndNotifyToday();
+    tryRegisterPeriodicSync();
+  });
+}else{
+  refreshNotifyUI();
+}
+
+/* =========================================================
+   READING TAB — progress persisted per glyph
+========================================================= */
+let currentScript = 'hira';
+const kanaGroupsEl = document.getElementById('kanaGroups');
+const spokenKana = new Set(store.get('spokenKana', []));
+
+function cellsFromRow(row, script){
+  return row.cells.map(pair=>{
+    if(!pair) return null;
+    const [hira, romaji] = pair;
+    const glyph = script==='hira' ? hira : toKatakana(hira);
+    return [glyph, romaji];
+  });
+}
+
+function renderKana(){
+  kanaGroupsEl.innerHTML = '';
+  const baseTitle = document.createElement('p');
+  baseTitle.className = 'kana-group-title';
+  baseTitle.textContent = 'seion · base sounds';
+  kanaGroupsEl.appendChild(baseTitle);
+
+  const baseGrid = document.createElement('div');
+  baseGrid.className = 'kana-grid';
+  HIRA_ROWS.forEach(row=>{
+    cellsFromRow(row, currentScript).forEach(pair=> baseGrid.appendChild(makeKanaCell(pair)));
+  });
+  const nGlyph = currentScript==='hira' ? HIRA_N[0] : toKatakana(HIRA_N[0]);
+  baseGrid.appendChild(makeKanaCell([nGlyph, HIRA_N[1]]));
+  kanaGroupsEl.appendChild(baseGrid);
+
+  const dakuTitle = document.createElement('p');
+  dakuTitle.className = 'kana-group-title';
+  dakuTitle.textContent = 'dakuten & handakuten · voiced sounds';
+  kanaGroupsEl.appendChild(dakuTitle);
+
+  const dakuGrid = document.createElement('div');
+  dakuGrid.className = 'kana-grid';
+  DAKU_ROWS.forEach(row=>{
+    cellsFromRow(row, currentScript).forEach(pair=> dakuGrid.appendChild(makeKanaCell(pair)));
+  });
+  kanaGroupsEl.appendChild(dakuGrid);
+
+  maybeAwardReadingStamp();
+}
+
+function makeKanaCell(pair){
+  if(!pair){
+    const empty = document.createElement('div');
+    empty.className = 'kana-cell empty';
+    return empty;
+  }
+  const [glyph, romaji] = pair;
+  const key = currentScript+':'+romaji;
+  const btn = document.createElement('button');
+  btn.className = 'kana-cell' + (spokenKana.has(key) ? ' learned' : '');
+  btn.innerHTML = `<span class="glyph">${glyph}</span><span class="romaji">${romaji}</span>`;
+  btn.addEventListener('click', ()=>{
+    speakJapanese(glyph);
+    btn.classList.add('speaking');
+    setTimeout(()=> btn.classList.remove('speaking'), 500);
+    spokenKana.add(key);
+    btn.classList.add('learned');
+    store.set('spokenKana', [...spokenKana]);
+    maybeAwardReadingStamp();
+  });
+  return btn;
+}
+
+function maybeAwardReadingStamp(){
+  const hiraCount = [...spokenKana].filter(k=>k.startsWith('hira:')).length;
+  const kataCount = [...spokenKana].filter(k=>k.startsWith('kata:')).length;
+  if(hiraCount >= 8 && kataCount >= 8){
+    awardStamp('kana explored', 'reading');
+  }
+}
+
+document.querySelectorAll('.script-toggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.script-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentScript = btn.dataset.script;
+    renderKana();
+  });
+});
+renderKana();
+
+const kanjiGrid = document.getElementById('kanjiGrid');
+const seenKanji = new Set(store.get('seenKanji', []));
+KANJI_LIST.forEach(entry=>{
+  const card = document.createElement('div');
+  card.className = 'kanji-card' + (seenKanji.has(entry.k) ? ' learned' : '');
+  card.innerHTML = `
+    <div class="glyph">${entry.k}</div>
+    <div class="readings"><b>on</b> ${entry.on} &nbsp; <b>kun</b> ${entry.kun}</div>
+    <div class="mean">${entry.mean}</div>
+  `;
+  card.addEventListener('click', ()=>{
+    speakJapanese(entry.k);
+    seenKanji.add(entry.k);
+    card.classList.add('learned');
+    store.set('seenKanji', [...seenKanji]);
+    if(seenKanji.size >= 10){
+      awardStamp('kanji explored', 'kanji');
+    }
+  });
+  kanjiGrid.appendChild(card);
+});
+
+/* =========================================================
+   WRITING TAB
+========================================================= */
+const canvas = document.getElementById('writeCanvas');
+const ctx = canvas.getContext('2d');
+let showGuide = true;
+let writePool = [];
+let writeIndex = 0;
+
+function buildWritePool(){
+  const pool = [];
+  if(document.querySelector('.pool-btn[data-pool="hira"]').classList.contains('on')){
+    HIRA_ROWS.forEach(r=> r.cells.forEach(c=> c && pool.push({glyph:c[0], romaji:c[1], mean:''})));
+    pool.push({glyph:HIRA_N[0], romaji:HIRA_N[1], mean:''});
+  }
+  if(document.querySelector('.pool-btn[data-pool="kata"]').classList.contains('on')){
+    HIRA_ROWS.forEach(r=> r.cells.forEach(c=> c && pool.push({glyph:toKatakana(c[0]), romaji:c[1], mean:''})));
+    pool.push({glyph:toKatakana(HIRA_N[0]), romaji:HIRA_N[1], mean:''});
+  }
+  if(document.querySelector('.pool-btn[data-pool="kanji"]').classList.contains('on')){
+    KANJI_LIST.forEach(k=> pool.push({glyph:k.k, romaji:k.kun.replace(/-/g,''), mean:k.mean}));
+  }
+  writePool = pool.length ? pool : [{glyph:'あ', romaji:'a', mean:''}];
+  writeIndex = 0;
+}
+
+function drawGuideChar(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!showGuide) return;
+  const entry = writePool[writeIndex];
+  ctx.save();
+  ctx.globalAlpha = .16;
+  ctx.fillStyle = '#211f1a';
+  ctx.font = "170px 'Hiragino Mincho ProN','Yu Mincho',serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(entry.glyph, canvas.width/2, canvas.height/2 + 8);
+  ctx.restore();
+}
+
+const writeFeedbackEl = document.getElementById('writeFeedback');
+const btnNextChar = document.getElementById('btnNextChar');
+const btnGotIt = document.getElementById('btnGotIt');
+
+function resetWriteFeedback(){
+  writeFeedbackEl.textContent = '';
+  writeFeedbackEl.className = 'write-feedback';
+  btnNextChar.disabled = true;
+}
+
+function setWriteFeedback(ok, hint){
+  if(ok){
+    writeFeedbackEl.textContent = '✓ looks right — nice work! ' + (hint||'');
+    writeFeedbackEl.className = 'write-feedback ok';
+    btnNextChar.disabled = false;
+  }else{
+    writeFeedbackEl.textContent = '✗ not quite a match yet — clear and try again. ' + (hint||'');
+    writeFeedbackEl.className = 'write-feedback no';
+    btnNextChar.disabled = true;
+  }
+}
+
+// Rough shape-match: renders the target glyph (fattened for tolerance) and
+// the user's ink onto hidden canvases, then compares pixel overlap. This is
+// a lightweight heuristic, not real handwriting recognition — it rewards
+// strokes that land roughly on the character in roughly the right place.
+function scoreWriting(){
+  const entry = writePool[writeIndex];
+  const w = canvas.width, h = canvas.height;
+
+  const tmpl = document.createElement('canvas');
+  tmpl.width = w; tmpl.height = h;
+  const tctx = tmpl.getContext('2d');
+  tctx.fillStyle = '#000';
+  tctx.font = "170px 'Hiragino Mincho ProN','Yu Mincho',serif";
+  tctx.textAlign = 'center';
+  tctx.textBaseline = 'middle';
+  [[0,0],[5,0],[-5,0],[0,5],[0,-5],[4,4],[-4,4],[4,-4],[-4,-4]].forEach(([dx,dy])=>{
+    tctx.fillText(entry.glyph, w/2+dx, h/2+8+dy);
+  });
+
+  const ink = document.createElement('canvas');
+  ink.width = w; ink.height = h;
+  const ictx = ink.getContext('2d');
+  ictx.strokeStyle = '#000';
+  ictx.lineWidth = 8;
+  ictx.lineCap = 'round';
+  ictx.lineJoin = 'round';
+  strokes.forEach(stroke=>{
+    if(stroke.length < 2) return;
+    ictx.beginPath();
+    ictx.moveTo(stroke[0].x, stroke[0].y);
+    stroke.forEach(pt=> ictx.lineTo(pt.x, pt.y));
+    ictx.stroke();
+  });
+
+  const tData = tctx.getImageData(0,0,w,h).data;
+  const iData = ictx.getImageData(0,0,w,h).data;
+
+  let templatePixels = 0, inkPixels = 0, overlapPixels = 0;
+  for(let p=3; p<tData.length; p+=4){
+    const tOn = tData[p] > 40;
+    const iOn = iData[p] > 40;
+    if(tOn) templatePixels++;
+    if(iOn) inkPixels++;
+    if(tOn && iOn) overlapPixels++;
+  }
+
+  const coverage = templatePixels ? overlapPixels/templatePixels : 0;
+  const precision = inkPixels ? overlapPixels/inkPixels : 0;
+  const enoughInk = inkPixels > 250;
+  const looksRight = enoughInk && coverage >= 0.30 && precision >= 0.22;
+
+  if(!enoughInk) return { looksRight:false, hint:'(draw the character first)' };
+  return { looksRight, hint:'' };
+}
+
+function loadWriteChar(){
+  const entry = writePool[writeIndex];
+  document.getElementById('writeRomaji').textContent = entry.romaji;
+  document.getElementById('writeMean').textContent = entry.mean;
+  drawGuideChar();
+  resetWriteFeedback();
+}
+
+document.querySelectorAll('.pool-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const willTurnOff = btn.classList.contains('on');
+    const activeCount = document.querySelectorAll('.pool-btn.on').length;
+    if(willTurnOff && activeCount <= 1) return; // keep at least one script active
+    btn.classList.toggle('on');
+    buildWritePool();
+    strokes = [];
+    loadWriteChar();
+  });
+});
+
+document.getElementById('btnGuide').addEventListener('click', ()=>{
+  showGuide = !showGuide;
+  drawGuideChar();
+  redrawStrokes();
+});
+btnNextChar.addEventListener('click', ()=>{
+  if(btnNextChar.disabled) return;
+  writeIndex = (writeIndex + 1) % writePool.length;
+  strokes = [];
+  loadWriteChar();
+});
+document.getElementById('btnClearCanvas').addEventListener('click', ()=>{
+  strokes = [];
+  drawGuideChar();
+  resetWriteFeedback();
+});
+btnGotIt.addEventListener('click', ()=>{
+  const result = scoreWriting();
+  setWriteFeedback(result.looksRight, result.hint);
+  if(result.looksRight){
+    awardStamp('writing practiced', 'writing');
+  }
+});
+
+// freehand drawing, stored as strokes so guide/ink can redraw together
+let strokes = [];
+let currentStroke = null;
+let drawing = false;
+
+function canvasPoint(evt){
+  const rect = canvas.getBoundingClientRect();
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  return {
+    x: (clientX - rect.left) * (canvas.width / rect.width),
+    y: (clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+function redrawStrokes(){
+  ctx.save();
+  ctx.strokeStyle = '#26415c';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  strokes.forEach(stroke=>{
+    if(stroke.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(stroke[0].x, stroke[0].y);
+    stroke.forEach(pt=> ctx.lineTo(pt.x, pt.y));
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+function startDraw(evt){
+  evt.preventDefault();
+  drawing = true;
+  currentStroke = [canvasPoint(evt)];
+  strokes.push(currentStroke);
+}
+function moveDraw(evt){
+  if(!drawing) return;
+  evt.preventDefault();
+  currentStroke.push(canvasPoint(evt));
+  drawGuideChar();
+  redrawStrokes();
+}
+function endDraw(){ drawing = false; currentStroke = null; }
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', moveDraw);
+window.addEventListener('mouseup', endDraw);
+canvas.addEventListener('touchstart', startDraw, {passive:false});
+canvas.addEventListener('touchmove', moveDraw, {passive:false});
+canvas.addEventListener('touchend', endDraw);
+
+buildWritePool();
+loadWriteChar();
+
+/* =========================================================
+   SPEAKING TAB
+========================================================= */
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+const phraseListEl = document.getElementById('phraseList');
+let correctCount = store.get('correctCount', 0);
+
+function normalizeJp(s){
+  return (s||'').replace(/[\s、。！？・「」『』.,!?]/g,'');
+}
+
+let lastPhraseCat = null;
+PHRASES.forEach((p, idx)=>{
+  if(p.cat && p.cat !== lastPhraseCat){
+    const head = document.createElement('div');
+    head.className = 'kana-group-title phrase-group-title';
+    head.textContent = p.cat;
+    phraseListEl.appendChild(head);
+    lastPhraseCat = p.cat;
+  }
+  const card = document.createElement('div');
+  card.className = 'phrase-card';
+  card.innerHTML = `
+    <div>
+      <div class="phrase-jp">${p.jp}</div>
+      <div class="phrase-sub">${p.romaji}</div>
+      <div class="phrase-en">${p.en}</div>
+    </div>
+    <div class="phrase-actions">
+      <button class="btn ghost" data-listen="${idx}">🔊 listen</button>
+      <button class="btn mic-btn" data-mic="${idx}" ${SpeechRecognitionCtor ? '' : 'disabled'}>🎙 practice</button>
+      <span class="phrase-result" id="result-${idx}"></span>
+    </div>
+  `;
+  phraseListEl.appendChild(card);
+});
+
+phraseListEl.addEventListener('click', (e)=>{
+  const listenIdx = e.target.dataset.listen;
+  if(listenIdx !== undefined){
+    speakJapanese(PHRASES[listenIdx].jp);
+    return;
+  }
+  const micIdx = e.target.dataset.mic;
+  if(micIdx !== undefined){
+    startRecognition(parseInt(micIdx,10), e.target);
+  }
+});
+
+if(!SpeechRecognitionCtor){
+  document.getElementById('speechWarning').style.display = 'block';
+}
+
+function startRecognition(idx, btn){
+  const resultEl = document.getElementById('result-'+idx);
+  if(!SpeechRecognitionCtor){
+    resultEl.textContent = 'mic unavailable here';
+    resultEl.className = 'phrase-result no';
+    return;
+  }
+  const recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'ja-JP';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  btn.classList.add('listening');
+  resultEl.textContent = 'listening…';
+  resultEl.className = 'phrase-result';
+
+  recognition.onresult = (event)=>{
+    const target = normalizeJp(PHRASES[idx].jp);
+    let heard = '';
+    let matched = false;
+    for(let i=0;i<event.results[0].length;i++){
+      heard = event.results[0][i].transcript;
+      const norm = normalizeJp(heard);
+      if(norm === target || norm.includes(target) || target.includes(norm)){
+        matched = true;
+        break;
+      }
+    }
+    if(matched){
+      resultEl.textContent = '✓ heard: ' + heard;
+      resultEl.className = 'phrase-result ok';
+      correctCount++;
+      store.set('correctCount', correctCount);
+      if(correctCount >= 3){
+        awardStamp('speaking practiced', 'speaking');
+      }
+    } else {
+      resultEl.textContent = '— heard: ' + heard;
+      resultEl.className = 'phrase-result no';
+    }
+  };
+  recognition.onerror = (event)=>{
+    resultEl.textContent = event.error === 'not-allowed'
+      ? 'microphone blocked here'
+      : 'error: ' + event.error;
+    resultEl.className = 'phrase-result no';
+  };
+  recognition.onend = ()=>{ btn.classList.remove('listening'); };
+  try{ recognition.start(); } catch(err){
+    resultEl.textContent = 'could not start mic';
+    resultEl.className = 'phrase-result no';
+    btn.classList.remove('listening');
+  }
+}
+
+/* =========================================================
+   TRANSLATE TAB — speak one language, hear + read the other.
+   Recognition needs an exact language to be accurate, so the person
+   picks a direction first; that same direction also tells us which
+   two languages to translate between and which voice to speak back
+   with. Translation itself needs the network (no offline model here),
+   so it fails gracefully with a clear message when unreachable.
+========================================================= */
+let translateDir = 'en-ja'; // 'en-ja' = speaking English -> hear Japanese, 'ja-en' = reverse
+document.querySelectorAll('#translateDirToggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#translateDirToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    translateDir = btn.dataset.dir;
+  });
+});
+
+const translateMicBtn = document.getElementById('translateMicBtn');
+const translateMicHint = document.getElementById('translateMicHint');
+const translateResultEl = document.getElementById('translateResult');
+const translateOriginalEl = document.getElementById('translateOriginal');
+const translateResultTextEl = document.getElementById('translateResultText');
+const translateHistoryEl = document.getElementById('translateHistory');
+const translateHistoryTitleEl = document.getElementById('translateHistoryTitle');
+let translateHistory = store.get('translateHistory', []);
+
+if(!SpeechRecognitionCtor){
+  translateMicBtn.disabled = true;
+  translateMicHint.textContent = 'Speech recognition needs a browser like Chrome — open this page in a standalone tab to unlock it.';
+}
+
+function speakText(text, lang){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang;
+  if(lang === 'ja-JP' && jaVoice) utter.voice = jaVoice;
+  utter.rate = lang === 'ja-JP' ? 0.82 : 0.95;
+  speechSynthesis.speak(utter);
+}
+
+async function translateText(text, fromCode, toCode){
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) +
+              '&langpair=' + fromCode + '|' + toCode;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('bad status ' + res.status);
+  const data = await res.json();
+  const translated = data && data.responseData && data.responseData.translatedText;
+  if(!translated) throw new Error('no translation returned');
+  return translated;
+}
+
+function renderTranslateHistory(){
+  translateHistoryEl.innerHTML = '';
+  translateHistoryTitleEl.style.display = translateHistory.length ? 'block' : 'none';
+  translateHistory.forEach(entry=>{
+    const card = document.createElement('div');
+    card.className = 'dict-card';
+    const jpText = entry.dir === 'en-ja' ? entry.translated : entry.original;
+    const enText = entry.dir === 'en-ja' ? entry.original : entry.translated;
+    card.innerHTML = `
+      <span class="jp">${jpText}</span>
+      <span class="en">${enText}</span>
+      <span class="src">${entry.dir === 'en-ja' ? 'EN → JA' : 'JA → EN'}</span>
+    `;
+    card.addEventListener('click', ()=>{
+      speakText(jpText, 'ja-JP');
+    });
+    translateHistoryEl.appendChild(card);
+  });
+}
+renderTranslateHistory();
+
+translateMicBtn.addEventListener('click', ()=>{
+  if(!SpeechRecognitionCtor){
+    translateMicHint.textContent = 'Speech recognition isn\'t available in this browser/embed.';
+    translateMicHint.className = 'dict-mic-hint no';
+    return;
+  }
+  const speakingEnglish = translateDir === 'en-ja';
+  const fromLang = speakingEnglish ? 'en-US' : 'ja-JP';
+  const toLang   = speakingEnglish ? 'ja-JP' : 'en-US';
+  const fromCode = speakingEnglish ? 'en' : 'ja';
+  const toCode   = speakingEnglish ? 'ja' : 'en';
+
+  const recognition = new SpeechRecognitionCtor();
+  recognition.lang = fromLang;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  translateMicBtn.classList.add('listening');
+  translateMicHint.textContent = speakingEnglish ? 'listening for English…' : '聞いています… listening for Japanese…';
+  translateMicHint.className = 'dict-mic-hint';
+  translateResultEl.style.display = 'none';
+
+  recognition.onresult = async (event)=>{
+    const heard = event.results[0][0].transcript.trim();
+    translateMicHint.textContent = 'translating…';
+    try{
+      const translated = await translateText(heard, fromCode, toCode);
+      translateOriginalEl.textContent = heard;
+      translateResultTextEl.textContent = translated;
+      translateResultEl.style.display = 'flex';
+      translateMicHint.textContent = '';
+      speakText(translated, toLang);
+      translateHistory = [{original:heard, translated, dir:translateDir, ts:Date.now()}, ...translateHistory].slice(0,12);
+      store.set('translateHistory', translateHistory);
+      renderTranslateHistory();
+      awardStamp('translator used', 'translate');
+    }catch(err){
+      translateMicHint.textContent = navigator.onLine === false
+        ? 'Translation needs an internet connection — you are offline right now.'
+        : 'Translation service is unavailable right now — try again in a moment.';
+      translateMicHint.className = 'dict-mic-hint no';
+    }
+  };
+  recognition.onerror = (event)=>{
+    translateMicHint.textContent = event.error === 'not-allowed'
+      ? 'Microphone blocked — allow mic access to use the translator.'
+      : 'Could not catch that (' + event.error + ') — try again.';
+    translateMicHint.className = 'dict-mic-hint no';
+  };
+  recognition.onend = ()=>{ translateMicBtn.classList.remove('listening'); };
+  try{ recognition.start(); } catch(err){
+    translateMicHint.textContent = 'Could not start the microphone.';
+    translateMicHint.className = 'dict-mic-hint no';
+    translateMicBtn.classList.remove('listening');
+  }
+});
+
+document.getElementById('replayOriginal').addEventListener('click', ()=>{
+  speakText(translateOriginalEl.textContent, translateDir === 'en-ja' ? 'en-US' : 'ja-JP');
+});
+document.getElementById('replayTranslation').addEventListener('click', ()=>{
+  speakText(translateResultTextEl.textContent, translateDir === 'en-ja' ? 'ja-JP' : 'en-US');
+});
+
+/* =========================================================
+   DICTIONARY TAB — favorites + recent searches persisted
+========================================================= */
+const dictInput = document.getElementById('dictInput');
+const dictResults = document.getElementById('dictResults');
+const dictStatus = document.getElementById('dictStatus');
+const dictHistoryEl = document.getElementById('dictHistory');
+let favorites = store.get('favorites', []); // array of jp strings
+let searchHistory = store.get('searchHistory', []); // array of query strings, most recent first
+
+function isFavorite(jp){ return favorites.includes(jp); }
+function toggleFavorite(jp){
+  if(isFavorite(jp)) favorites = favorites.filter(f=>f!==jp);
+  else favorites = [jp, ...favorites].slice(0, 50);
+  store.set('favorites', favorites);
+}
+function pushHistory(query){
+  searchHistory = [query, ...searchHistory.filter(q=>q.toLowerCase()!==query.toLowerCase())].slice(0, 8);
+  store.set('searchHistory', searchHistory);
+  renderHistory();
+}
+function renderHistory(){
+  dictHistoryEl.innerHTML = '';
+  searchHistory.forEach(q=>{
+    const b = document.createElement('button');
+    b.textContent = q;
+    b.addEventListener('click', ()=>{ dictInput.value = q; runSearch(); });
+    dictHistoryEl.appendChild(b);
+  });
+}
+renderHistory();
+
+function searchLocal(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  return LOCAL_DICTIONARY.filter(e=>
+    e.jp.includes(query) || e.kana.includes(query) ||
+    e.romaji.toLowerCase().includes(q) || e.en.toLowerCase().includes(q)
+  );
+}
+
+function renderDictCard(entry){
+  const div = document.createElement('div');
+  div.className = 'dict-card';
+  const fav = isFavorite(entry.jp);
+  div.innerHTML = `
+    <button class="fav ${fav?'on':''}" title="save word" aria-label="save word">${fav?'★':'☆'}</button>
+    <span class="jp">${entry.jp}</span>
+    <span class="kana">${entry.kana || ''}</span>
+    <span class="en">${entry.en}</span>
+    <span class="src ${entry.source==='live' ? 'live' : ''}">${entry.source==='live' ? 'live' : 'built-in'}</span>
+  `;
+  div.querySelector('.fav').addEventListener('click', ()=>{
+    toggleFavorite(entry.jp);
+    const btn = div.querySelector('.fav');
+    const nowOn = isFavorite(entry.jp);
+    btn.classList.toggle('on', nowOn);
+    btn.textContent = nowOn ? '★' : '☆';
+  });
+  return div;
+}
+
+async function runSearch(){
+  const query = dictInput.value.trim();
+  if(!query){ dictStatus.textContent = ''; dictResults.innerHTML = ''; return; }
+
+  pushHistory(query);
+  dictStatus.textContent = 'searching…';
+  dictResults.innerHTML = '';
+
+  const localMatches = searchLocal(query).map(e=> ({jp:e.jp, kana:e.kana, en:e.en, source:'local'}));
+  localMatches.forEach(m=> dictResults.appendChild(renderDictCard(m)));
+
+  awardStamp('dictionary used', 'dictionary');
+
+  // Try a live lookup too, only if the browser reports it's online.
+  // If unreachable, fail quietly and keep the built-in results already showing.
+  if(navigator.onLine === false){
+    dictStatus.textContent = localMatches.length
+      ? localMatches.length + ' built-in result(s). You are offline — live dictionary skipped.'
+      : 'Offline, and no built-in matches — try another word.';
+    return;
+  }
+
+  try{
+    const res = await fetch('https://jotoba.de/api/search/words', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ query, language:'English', no_english:false })
+    });
+    if(!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    const words = Array.isArray(data.words) ? data.words : [];
+    const liveMatches = words.slice(0, 10).map(w=>{
+      const jp = (w.reading && (w.reading.kanji || w.reading.kana)) || query;
+      const kana = (w.reading && w.reading.kana) || '';
+      const glosses = (w.senses && w.senses[0] && w.senses[0].glosses) || [];
+      return { jp, kana, en: glosses.join(', ') || '(no gloss)', source:'live' };
+    }).filter(m=> m.en && m.en !== '(no gloss)');
+
+    if(liveMatches.length){
+      dictResults.innerHTML = '';
+      liveMatches.forEach(m=> dictResults.appendChild(renderDictCard(m)));
+      localMatches.forEach(m=> dictResults.appendChild(renderDictCard(m)));
+      dictStatus.textContent = liveMatches.length + ' live result(s), ' + localMatches.length + ' built-in.';
+    } else {
+      dictStatus.textContent = localMatches.length
+        ? localMatches.length + ' built-in result(s). Live dictionary had no matches.'
+        : 'No matches — try an English word, rōmaji, or kana.';
+    }
+  } catch(err){
+    dictStatus.textContent = localMatches.length
+      ? localMatches.length + ' built-in result(s). Live dictionary unavailable right now.'
+      : 'No built-in matches, and the live dictionary is unreachable here — try another word.';
+  }
+
+  if(!localMatches.length && dictResults.children.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'dict-empty';
+    empty.textContent = 'Nothing found yet — try an English word like "water", a rōmaji spelling, or kana.';
+    dictResults.appendChild(empty);
+  }
+}
+
+document.getElementById('dictSearchBtn').addEventListener('click', runSearch);
+dictInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') runSearch(); });
+
+/* ---- speak-to-translate: recognize spoken Japanese, then search it ---- */
+const dictMicBtn = document.getElementById('dictMicBtn');
+const dictMicHint = document.getElementById('dictMicHint');
+
+if(!SpeechRecognitionCtor){
+  dictMicBtn.disabled = true;
+  dictMicHint.textContent = 'Mic input needs a browser with speech recognition (e.g. Chrome) — open this page in a standalone tab to unlock it.';
+}
+
+dictMicBtn.addEventListener('click', ()=>{
+  if(!SpeechRecognitionCtor){
+    dictMicHint.textContent = 'Speech recognition isn\'t available in this browser/embed.';
+    dictMicHint.className = 'dict-mic-hint no';
+    return;
+  }
+  const recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'ja-JP';       // listens for Japanese
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  dictMicBtn.classList.add('listening');
+  dictMicHint.textContent = '聞いています… listening for Japanese…';
+  dictMicHint.className = 'dict-mic-hint';
+
+  recognition.onresult = (event)=>{
+    const heard = event.results[0][0].transcript.trim();
+    dictInput.value = heard;
+    dictMicHint.textContent = '🎙 heard: ' + heard + ' — translating…';
+    dictMicHint.className = 'dict-mic-hint ok';
+    runSearch();
+  };
+  recognition.onerror = (event)=>{
+    dictMicHint.textContent = event.error === 'not-allowed'
+      ? 'Microphone blocked — allow mic access to use speak-to-translate.'
+      : 'Could not catch that (' + event.error + ') — try again.';
+    dictMicHint.className = 'dict-mic-hint no';
+  };
+  recognition.onend = ()=>{ dictMicBtn.classList.remove('listening'); };
+  try{ recognition.start(); } catch(err){
+    dictMicHint.textContent = 'Could not start the microphone.';
+    dictMicHint.className = 'dict-mic-hint no';
+    dictMicBtn.classList.remove('listening');
+  }
+});
+
+/* =========================================================
+   ONLINE / OFFLINE STATUS
+========================================================= */
+function updateOnlineStatus(){
+  const el = document.getElementById('onlineStatus');
+  const text = document.getElementById('onlineStatusText');
+  const online = navigator.onLine;
+  el.classList.toggle('offline', !online);
+  text.textContent = online ? 'online' : 'offline — everything except live dictionary lookups still works';
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+/* =========================================================
+   PWA — install prompt + service worker registration
+========================================================= */
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.classList.add('show');
+});
+installBtn.addEventListener('click', async ()=>{
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.classList.remove('show');
+});
+window.addEventListener('appinstalled', ()=>{
+  installBtn.classList.remove('show');
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    // Registered relative to this file's own path, so it works whether
+    // the app is hosted at a domain root or a sub-path.
+    navigator.serviceWorker.register('sw.js').catch(()=>{
+      // Registration fails silently on file:// or unsupported hosts —
+      // the app still works fully, it just won't be installable there.
+    });
+  });
+}
+
+/* =========================================================
+   REGISTRATION GATE — Full name, age, gender, country
+========================================================= */
+const COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (DRC)','Congo (Republic)','Costa Rica','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Lucia','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe','Other / not listed'];
+
+const regOverlay = document.getElementById('regOverlay');
+const regForm = document.getElementById('regForm');
+const regError = document.getElementById('regError');
+const regCountrySelect = document.getElementById('regCountry');
+COUNTRIES.forEach(c=>{
+  const opt = document.createElement('option');
+  opt.value = c; opt.textContent = c;
+  regCountrySelect.appendChild(opt);
+});
+
+function getProfile(){ return store.get('profile', null); }
+
+function renderProfileInSettings(){
+  const p = getProfile();
+  const nameEl = document.getElementById('profileName');
+  const metaEl = document.getElementById('profileMeta');
+  const avatarEl = document.getElementById('profileAvatar');
+  if(!p){ return; }
+  nameEl.textContent = p.name;
+  metaEl.textContent = [p.age + ' yrs', p.gender, p.country].filter(Boolean).join(' · ');
+  avatarEl.textContent = p.name.trim().charAt(0).toUpperCase() || '?';
+}
+
+function showRegOverlay(prefill){
+  if(prefill){
+    document.getElementById('regName').value = prefill.name || '';
+    document.getElementById('regAge').value = prefill.age || '';
+    document.getElementById('regGender').value = prefill.gender || '';
+    document.getElementById('regCountry').value = prefill.country || '';
+  }
+  regOverlay.hidden = false;
+}
+function hideRegOverlay(){ regOverlay.hidden = true; }
+
+regForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const age = document.getElementById('regAge').value;
+  const gender = document.getElementById('regGender').value;
+  const country = document.getElementById('regCountry').value;
+
+  if(!name){ regError.textContent = 'Please enter your full name.'; return; }
+  if(!age || Number(age) < 3 || Number(age) > 120){ regError.textContent = 'Please enter a valid age.'; return; }
+  if(!gender){ regError.textContent = 'Please select a gender.'; return; }
+  if(!country){ regError.textContent = 'Please select a country.'; return; }
+
+  regError.textContent = '';
+  const profile = { name, age:Number(age), gender, country, registeredAt: new Date().toISOString() };
+  store.set('profile', profile);
+  hideRegOverlay();
+  renderProfileInSettings();
+  renderCertArea();
+});
+
+// "Edit profile" — clicking the profile card in Settings reopens the form pre-filled.
+document.getElementById('profileAvatar').closest('.dev-card').style.cursor = 'pointer';
+document.getElementById('profileAvatar').closest('.dev-card').title = 'Tap to edit your profile';
+document.getElementById('profileAvatar').closest('.dev-card').addEventListener('click', ()=>{
+  showRegOverlay(getProfile());
+});
+
+if(!getProfile()){
+  showRegOverlay();
+}else{
+  renderProfileInSettings();
+}
+
+/* =========================================================
+   TEST — quizzes built from the app's own kana/kanji/phrase/word data
+========================================================= */
+const PASS_THRESHOLD = 0.7; // 70%
+const testResults = store.get('testResults', {}); // { quizId: {passed, score, date} }
+
+function shuffleArr(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function sample(arr, n){ return shuffleArr(arr).slice(0, n); }
+
+function buildKanaQuiz(){
+  const pool = [];
+  HIRA_ROWS.forEach(row=> row.cells.forEach(c=>{ if(c) pool.push({glyph:c[0], answer:c[1]}); }));
+  DAKU_ROWS.forEach(row=> row.cells.forEach(c=>{ if(c) pool.push({glyph:c[0], answer:c[1]}); }));
+  pool.push({glyph:HIRA_N[0], answer:HIRA_N[1]});
+  // include katakana forms too
+  const kataPool = pool.map(p=>({glyph:toKatakana(p.glyph), answer:p.answer}));
+  const all = pool.concat(kataPool);
+  const chosen = sample(all, 10);
+  return chosen.map(item=>{
+    const distractors = sample(all.filter(o=>o.answer!==item.answer), 3).map(o=>o.answer);
+    const options = shuffleArr([item.answer, ...distractors]);
+    return { prompt:item.glyph, big:true, options, answer:item.answer };
+  });
+}
+
+function buildKanjiQuiz(){
+  const chosen = sample(KANJI_LIST, Math.min(8, KANJI_LIST.length));
+  return chosen.map(item=>{
+    const distractors = sample(KANJI_LIST.filter(o=>o.mean!==item.mean), 3).map(o=>o.mean);
+    const options = shuffleArr([item.mean, ...distractors]);
+    return { prompt:item.k, big:true, options, answer:item.mean };
+  });
+}
+
+function buildVocabQuiz(){
+  const chosen = sample(LOCAL_DICTIONARY, Math.min(8, LOCAL_DICTIONARY.length));
+  return chosen.map(item=>{
+    const distractors = sample(LOCAL_DICTIONARY.filter(o=>o.jp!==item.jp), 3).map(o=>o.jp+' （'+o.kana+'）');
+    const correct = item.jp+' （'+item.kana+'）';
+    const options = shuffleArr([correct, ...distractors]);
+    return { prompt:item.en, big:false, options, answer:correct };
+  });
+}
+
+function buildPhraseQuiz(){
+  const chosen = sample(PHRASES, Math.min(8, PHRASES.length));
+  return chosen.map(item=>{
+    const distractors = sample(PHRASES.filter(o=>o.jp!==item.jp), 3).map(o=>o.jp);
+    const options = shuffleArr([item.jp, ...distractors]);
+    return { prompt:item.en, big:false, options, answer:item.jp };
+  });
+}
+
+const QUIZZES = [
+  { id:'kana',    title:'Hiragana & Katakana', jp:'かな', icon:'あ', desc:'Read the character and choose its romaji sound.', build:buildKanaQuiz,   flag:'quiz-kana' },
+  { id:'kanji',   title:'Kanji',               jp:'漢字', icon:'漢', desc:'Match each kanji to its meaning.',               build:buildKanjiQuiz,  flag:'quiz-kanji' },
+  { id:'vocab',   title:'Vocabulary',          jp:'単語', icon:'語', desc:'Pick the Japanese word for the English meaning.', build:buildVocabQuiz,  flag:'quiz-vocab' },
+  { id:'phrases', title:'Phrases',             jp:'会話', icon:'話', desc:'Choose the correct Japanese phrase.',            build:buildPhraseQuiz, flag:'quiz-phrases' },
+];
+
+const quizGrid = document.getElementById('quizGrid');
+const quizStage = document.getElementById('quizStage');
+
+function allQuizzesPassed(){
+  return QUIZZES.every(q => testResults[q.id] && testResults[q.id].passed);
+}
+
+function renderQuizGrid(){
+  quizGrid.innerHTML = '';
+  QUIZZES.forEach(q=>{
+    const res = testResults[q.id];
+    const passed = !!(res && res.passed);
+    const card = document.createElement('div');
+    card.className = 'quiz-card' + (passed ? ' passed' : '');
+    card.innerHTML = `
+      <div class="quiz-card-top">
+        <div class="quiz-icon">${q.icon}</div>
+        <div>
+          <div class="quiz-title">${q.title}</div>
+          <div class="quiz-sub">${q.jp}</div>
+        </div>
+      </div>
+      <div class="quiz-desc">${q.desc}</div>
+      <div class="quiz-status ${passed?'passed':''}">${passed ? ('✓ passed · ' + res.score + '%') : (res ? ('last try: ' + res.score + '% — try again') : 'not started')}</div>
+      <button class="btn ${passed?'ghost':'primary'} small" data-quiz="${q.id}">${passed ? 'Retake' : (res ? 'Try again' : 'Start quiz')}</button>
+    `;
+    quizGrid.appendChild(card);
+  });
+  quizGrid.querySelectorAll('[data-quiz]').forEach(btn=>{
+    btn.addEventListener('click', ()=> startQuiz(btn.dataset.quiz));
+  });
+}
+
+function startQuiz(quizId){
+  const quiz = QUIZZES.find(q=>q.id===quizId);
+  const questions = quiz.build();
+  let idx = 0;
+  const userAnswers = [];
+
+  quizGrid.style.display = 'none';
+  quizStage.style.display = 'block';
+  quizStage.scrollIntoView({behavior:'smooth', block:'start'});
+
+  function renderQuestion(){
+    const item = questions[idx];
+    quizStage.innerHTML = `
+      <div class="quiz-stage-head">
+        <span>${quiz.title}</span>
+        <span>question ${idx+1} / ${questions.length}</span>
+      </div>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(idx/questions.length)*100}%"></div></div>
+      <div class="quiz-question ${item.big?'':'small'}">${item.prompt}</div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div class="quiz-foot">
+        <button class="btn ghost small" id="quizQuit">← back to tests</button>
+        <button class="btn primary small" id="quizNext" disabled>${idx===questions.length-1 ? 'Finish' : 'Next →'}</button>
+      </div>
+    `;
+    const optionsWrap = document.getElementById('quizOptions');
+    item.options.forEach(opt=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'quiz-option';
+      b.textContent = opt;
+      b.addEventListener('click', ()=>{
+        if(b.disabled) return;
+        optionsWrap.querySelectorAll('.quiz-option').forEach(o=>o.disabled = true);
+        const correct = opt === item.answer;
+        b.classList.add(correct ? 'correct' : 'wrong');
+        if(!correct){
+          optionsWrap.querySelectorAll('.quiz-option').forEach(o=>{
+            if(o.textContent === item.answer) o.classList.add('correct');
+          });
+        }
+        userAnswers.push(correct);
+        document.getElementById('quizFeedback').textContent = correct ? 'Correct!' : ('Not quite — correct answer: ' + item.answer);
+        document.getElementById('quizNext').disabled = false;
+      });
+      optionsWrap.appendChild(b);
+    });
+    document.getElementById('quizQuit').addEventListener('click', ()=>{
+      quizStage.style.display = 'none';
+      quizGrid.style.display = 'grid';
+    });
+    document.getElementById('quizNext').addEventListener('click', ()=>{
+      if(idx < questions.length-1){
+        idx++;
+        renderQuestion();
+      }else{
+        finishQuiz();
+      }
+    });
+  }
+
+  function finishQuiz(){
+    const correctCount = userAnswers.filter(Boolean).length;
+    const score = Math.round((correctCount / questions.length) * 100);
+    const passed = (correctCount / questions.length) >= PASS_THRESHOLD;
+    testResults[quiz.id] = { passed, score, date: new Date().toISOString() };
+    store.set('testResults', testResults);
+    if(passed) awardStamp(quiz.title + ' passed', quiz.flag);
+
+    quizStage.innerHTML = `
+      <div class="quiz-result">
+        <div class="quiz-result-score">${score}%</div>
+        <div class="quiz-result-label ${passed?'pass':'fail'}">${passed ? '合格 · Passed' : 'Not yet — try again'}</div>
+        <p>${passed
+          ? 'Well done — you got ' + correctCount + ' of ' + questions.length + ' right on the ' + quiz.title + ' quiz.'
+          : 'You got ' + correctCount + ' of ' + questions.length + ' right. You need ' + Math.ceil(questions.length*PASS_THRESHOLD) + ' or more to pass. Review that tab and try again.'}</p>
+        <div class="quiz-result-actions">
+          <button class="btn primary small" id="quizRetry">Retake this quiz</button>
+          <button class="btn ghost small" id="quizBack">← back to tests</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('quizRetry').addEventListener('click', ()=> startQuiz(quizId));
+    document.getElementById('quizBack').addEventListener('click', ()=>{
+      quizStage.style.display = 'none';
+      quizGrid.style.display = 'grid';
+      renderQuizGrid();
+      renderCertArea();
+    });
+  }
+
+  renderQuestion();
+}
+
+/* =========================================================
+   CERTIFICATE
+========================================================= */
+const certArea = document.getElementById('certArea');
+
+function renderCertArea(){
+  const p = getProfile();
+  const passedCount = QUIZZES.filter(q=> testResults[q.id] && testResults[q.id].passed).length;
+
+  if(!allQuizzesPassed() || !p){
+    certArea.innerHTML = `
+      <div class="cert-locked">
+        Pass all ${QUIZZES.length} quizzes above to unlock your certificate of completion.
+        <div class="progress-mini">${passedCount} / ${QUIZZES.length} quizzes passed</div>
+      </div>
+    `;
+    return;
+  }
+
+  const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+  certArea.innerHTML = `
+    <div class="certificate-wrap">
+      <div class="certificate" id="certificatePrint">
+        <div class="cert-seal" aria-hidden="true"></div>
+        <div class="cert-eyebrow">手習い · Tenarai</div>
+        <div class="cert-title">Certificate of Completion</div>
+        <div class="cert-body-text">This certifies that</div>
+        <span class="cert-name">${p.name}</span>
+        <div class="cert-body-text">has successfully completed all reading, writing, speaking, and vocabulary activities and passed every test in Tenarai's introductory Japanese course.</div>
+        <div class="cert-meta">
+          <div><div class="cm-label">Date</div><div class="cm-value">${dateStr}</div></div>
+          <div><div class="cm-label">Country</div><div class="cm-value">${p.country}</div></div>
+          <div><div class="cm-label">Score</div><div class="cm-value">${QUIZZES.map(q=>testResults[q.id].score+'%').join(' · ')}</div></div>
+        </div>
+      </div>
+      <div class="certificate-actions">
+        <button class="btn primary" id="certPrintBtn">🖨 Print / save as PDF</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('certPrintBtn').addEventListener('click', ()=> window.print());
+  awardStamp('certificate earned', 'certificate');
+}
+
+renderQuizGrid();
+renderCertArea();
+</script>
+</body>
+</html>
