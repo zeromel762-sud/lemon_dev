@@ -256,6 +256,34 @@
   .sidebar-bottom .tab{ font-weight:700; }
   .sidebar-bottom .tab .jp{ font-size:16px; }
 
+  /* ---------- Growing seed (sidebar) ---------- */
+  .seed-widget{
+    margin:16px 14px 2px; padding:14px 14px 12px;
+    border:1px dashed color-mix(in srgb, var(--take) 60%, var(--line));
+    border-radius:var(--radius); text-align:center;
+    background:rgba(92,122,82,.06);
+  }
+  .seed-icon{ font-size:30px; line-height:1; margin-bottom:6px; }
+  .seed-icon.sakura{ font-size:34px; }
+  .seed-label{
+    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
+    font-size:12.5px; color:var(--sumi); letter-spacing:.02em;
+  }
+  .seed-bar{
+    height:7px; background:color-mix(in srgb, var(--take) 25%, var(--line));
+    border-radius:999px; overflow:hidden; margin:9px 4px 6px;
+  }
+  .seed-fill{
+    height:100%; border-radius:999px; background:linear-gradient(90deg, var(--take), #8fb27a);
+    transition:width .5s ease; width:0;
+  }
+  .seed-fill.full{ background:linear-gradient(90deg, var(--shu), #e5938a); }
+  .seed-pts{
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:10.5px;
+    letter-spacing:.06em; color:var(--sumi-soft); text-transform:uppercase;
+  }
+
+
   @media(max-width:900px){
     .sidebar{
       position:fixed; top:0; left:0; bottom:0; z-index:100;
@@ -687,6 +715,41 @@
   }
 
   /* ==========================================================
+     INSTALLATION GUIDE GATE
+  ========================================================== */
+  .guide-card{ max-width:560px; }
+  .guide-list{
+    margin:0 0 8px; padding:0; list-style:none;
+  }
+  .guide-list li{
+    display:flex; gap:11px; align-items:flex-start;
+    padding:9px 12px; margin-bottom:8px;
+    border:1px solid var(--line); border-radius:8px;
+    background:rgba(255,253,247,.7);
+    font-size:13px; line-height:1.55; color:var(--sumi);
+  }
+  .guide-num{
+    flex:0 0 22px; height:22px; border-radius:50%;
+    background:var(--shu); color:#fff; font-size:11.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'SFMono-Regular','Consolas','Menlo',monospace; margin-top:1px;
+  }
+  .guide-list strong{ color:var(--shu-dark); }
+  .guide-note{
+    font-size:11.5px; color:var(--sumi-soft); line-height:1.6; margin:6px 0 18px;
+  }
+  .guide-agree{
+    display:flex; align-items:flex-start; gap:9px; margin:0 0 2px; cursor:pointer;
+    font-size:12.5px; color:var(--sumi); line-height:1.5;
+  }
+  .guide-agree input{
+    margin-top:2px; accent-color:var(--shu); width:16px; height:16px; flex:0 0 auto; cursor:pointer;
+  }
+  .guide-error{
+    font-size:12px; color:var(--shu); margin:0 0 6px; min-height:14px;
+  }
+
+  /* ==========================================================
      TEST / QUIZ
   ========================================================== */
   .quiz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
@@ -724,6 +787,10 @@
   }
   .quiz-bar{ height:4px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:24px; }
   .quiz-bar-fill{ height:100%; background:var(--shu); transition:width .25s ease; }
+
+  /* ---------- Dashboard: daily quiz ---------- */
+  .daily-quiz .btn{ margin-top:12px; }
+  .daily-intro{ font-size:13px; color:var(--sumi-soft); line-height:1.6; margin:0 0 6px; }
   .quiz-question{
     font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
     font-size:clamp(30px,6vw,46px); text-align:center; margin:6px 0 26px; color:var(--sumi); line-height:1.25;
@@ -857,6 +924,28 @@
   </div>
 </div>
 
+<div class="reg-overlay" id="guideOverlay" hidden>
+  <div class="reg-card guide-card">
+    <div class="reg-mark" aria-hidden="true"></div>
+    <h2>Installation Guide</h2>
+    <p class="reg-sub">Follow these steps to install Tenarai on your device so it works fully offline.</p>
+    <ol class="guide-list">
+      <li><span class="guide-num">1</span><span>Click the provided link.</span></li>
+      <li><span class="guide-num">2</span><span>Once the website opens, tap the three dots (⋮) at the top-right corner of your browser.</span></li>
+      <li><span class="guide-num">3</span><span>Select <strong>Open in external browser</strong>.</span></li>
+      <li><span class="guide-num">4</span><span>After the page opens in your default browser, look for the <strong>Install App</strong> button at the top of the page.</span></li>
+      <li><span class="guide-num">5</span><span>Tap <strong>Install App</strong>, then follow the on-screen instructions to complete the installation.</span></li>
+    </ol>
+    <p class="guide-note">💡 Once installed, Tenarai runs from your home screen with no internet needed. Finish here or in the new app window, then continue.</p>
+    <label class="guide-agree">
+      <input type="checkbox" id="guideCheck">
+      <span>I have read and completed the installation steps above, and I agree to continue.</span>
+    </label>
+    <p class="guide-error" id="guideError"></p>
+    <button type="button" class="btn primary" id="guideAgreeBtn">Agree &amp; Continue</button>
+  </div>
+</div>
+
 <header>
   <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
     <span></span><span></span><span></span>
@@ -890,6 +979,9 @@
       <button class="tab" data-tab="dict"><span class="jp">引く</span><span class="en">Dictionary</span></button>
       <button class="tab" data-tab="test"><span class="jp">試験</span><span class="en">Test</span></button>
     </nav>
+    <div class="seed-widget" id="seedGrow" title="Your growing seed — earn points by opening the app daily, doing activities, and taking quizzes. Reach 100 to bloom into a sakura tree!">
+      <!-- rendered by JS -->
+    </div>
     <div class="sidebar-bottom">
       <button class="tab" data-tab="settings"><span class="jp">設定</span><span class="en">Settings</span></button>
     </div>
@@ -919,6 +1011,12 @@
         </div>
         <button class="btn ghost small" id="wotdListenBtn">🔊 listen</button>
       </div>
+    </div>
+
+    <!-- Daily quiz: numbers 1-10 -->
+    <div class="settings-block">
+      <h3>Daily quiz · Numbers 1–10</h3>
+      <div class="daily-quiz" id="dailyQuiz"></div>
     </div>
 
     <!-- Japan intro + facts -->
@@ -1334,6 +1432,45 @@ const KANJI_LIST = [
   {k:'学',on:'ガク',kun:'まな-ぶ',mean:'study, learning'},
 ];
 
+// English number names 1-100, used for the phrase card's English label.
+function numberToEnglish(n){
+  const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten',
+    'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  if(n < 20) return ones[n];
+  if(n < 100){
+    const t = Math.floor(n/10), o = n%10;
+    return tens[t] + (o ? '-' + ones[o] : '');
+  }
+  return 'one hundred';
+}
+
+// Builds the Numbers 1-100 phrase entries in Japanese hiragana.
+function buildJapaneseNumbers(){
+  const onesJp = ['','いち','に','さん','よん','ご','ろく','なな','はち','きゅう'];
+  const onesRom = ['','ichi','ni','san','yon','go','roku','nana','hachi','kyuu'];
+  const tensJp = ['','','にじゅう','さんじゅう','よんじゅう','ごじゅう','ろくじゅう','ななじゅう','はちじゅう','きゅうじゅう'];
+  const tensRom = ['','','ni juu','san juu','yon juu','go juu','roku juu','nana juu','hachi juu','kyuu juu'];
+  const arr = [];
+  for(let n = 1; n <= 100; n++){
+    let jp, romaji;
+    if(n === 100){ jp = 'ひゃく'; romaji = 'hyaku'; }
+    else if(n < 10){ jp = onesJp[n]; romaji = onesRom[n]; }
+    else if(n < 20){
+      const o = n % 10;
+      jp = 'じゅう' + (o ? onesJp[o] : '');
+      romaji = 'juu' + (o ? ' ' + onesRom[o] : '');
+    }else{
+      const t = Math.floor(n/10), o = n % 10;
+      jp = tensJp[t] + (o ? onesJp[o] : '');
+      romaji = tensRom[t] + (o ? ' ' + onesRom[o] : '');
+    }
+    arr.push({ cat:'Numbers', jp, romaji, en:numberToEnglish(n) });
+  }
+  return arr;
+}
+const NUMBERS_1_100 = buildJapaneseNumbers();
+
 const PHRASES = [
   // Greetings
   {cat:'Greetings', jp:'こんにちは', romaji:'konnichiwa', en:'hello / good afternoon'},
@@ -1364,12 +1501,8 @@ const PHRASES = [
   {cat:'Out & about', jp:'これをください', romaji:'kore wo kudasai', en:'this one, please'},
   {cat:'Out & about', jp:'おいしいです', romaji:'oishii desu', en:"it's delicious"},
   {cat:'Out & about', jp:'がんばって', romaji:'ganbatte', en:'good luck / do your best'},
-  // Numbers
-  {cat:'Numbers', jp:'いち', romaji:'ichi', en:'one'},
-  {cat:'Numbers', jp:'に', romaji:'ni', en:'two'},
-  {cat:'Numbers', jp:'さん', romaji:'san', en:'three'},
-  {cat:'Numbers', jp:'よん', romaji:'yon', en:'four'},
-  {cat:'Numbers', jp:'ご', romaji:'go', en:'five'},
+  // Numbers 1-100 — generated by buildJapaneseNumbers() above
+  ...NUMBERS_1_100,
 ];
 
 const LOCAL_DICTIONARY = [
@@ -1476,6 +1609,74 @@ if(!storageWorks){
 }
 
 /* =========================================================
+   GROWING SEED (sidebar) — earn points by opening the app
+   daily (+1/day), completing activities (+1 each), and
+   taking quizzes (score-based, up to 3). At 100 pts the
+   seed blooms into a sakura tree.
+========================================================= */
+const SEED_GOAL = 100;
+const SEED_QUIZ_MAX = 3;                 // points for a perfect score (10/10)
+const SEED_QUIZ_FLAGS = ['quiz-kana','quiz-kanji','quiz-vocab','quiz-phrases','daily-quiz'];
+const SEED_CERT_FLAG = 'certificate';
+let seedPts = Math.min(SEED_GOAL, store.get('seedPts', 0));
+const seedEl = document.getElementById('seedGrow');
+
+function seedStage(pts){
+  if(pts >= SEED_GOAL) return { icon:'🌸', label:'Sakura tree', cls:'sakura' };
+  if(pts >= 80)        return { icon:'🌸🌳', label:'Budding tree', cls:'' };
+  if(pts >= 60)        return { icon:'🌳', label:'Young tree', cls:'' };
+  if(pts >= 40)        return { icon:'🪴', label:'Sapling', cls:'' };
+  if(pts >= 20)        return { icon:'🌿', label:'Sprout', cls:'' };
+  return { icon:'🌱', label:'Seed', cls:'' };
+}
+
+function renderSeed(){
+  if(!seedEl) return;
+  const st = seedStage(seedPts);
+  const pct  = Math.min(100, Math.round((seedPts / SEED_GOAL) * 100));
+  const full = seedPts >= SEED_GOAL;
+  seedEl.innerHTML = `
+    <div class="seed-icon ${full ? 'sakura' : ''}">${st.icon}</div>
+    <div class="seed-label">${st.label}</div>
+    <div class="seed-bar"><div class="seed-fill ${full ? 'full' : ''}" style="width:${pct}%"></div></div>
+    <div class="seed-pts">${Math.min(seedPts, SEED_GOAL)} / ${SEED_GOAL} pts</div>
+  `;
+}
+
+function addSeedPts(n){
+  if(seedPts >= SEED_GOAL){ renderSeed(); return; }
+  const before = seedPts;
+  seedPts = Math.min(SEED_GOAL, seedPts + n);
+  store.set('seedPts', seedPts);
+  renderSeed();
+  if(seedPts >= SEED_GOAL && before < SEED_GOAL){
+    // Celebrate the bloom into a sakura tree.
+    const burst = document.getElementById('stampBurst');
+    burst.querySelector('.small').textContent = '🌸 sakura tree bloomed!';
+    burst.classList.remove('fire');
+    void burst.offsetWidth;
+    burst.classList.add('fire');
+  }
+}
+
+// Points earned from a quiz, based on how many were answered correctly:
+// a perfect score (e.g. 10/10) gives SEED_QUIZ_MAX points.
+function quizSeedPoints(correct, total){
+  return total ? Math.min(SEED_QUIZ_MAX, Math.round(SEED_QUIZ_MAX * correct / total)) : 0;
+}
+
+// +1 point for the first app open of each day.
+(function applyDailyOpenSeed(){
+  const last = store.get('seedLastOpen', '');
+  if(last !== todayKey()){
+    store.set('seedLastOpen', todayKey());
+    addSeedPts(1);
+  } else {
+    renderSeed();
+  }
+})();
+
+/* =========================================================
    STAMP ALBUM (signature interaction) — persisted
 ========================================================= */
 const STAMP_TARGET = 8;
@@ -1509,6 +1710,12 @@ function awardStamp(label, flagKey){
   burst.classList.remove('fire');
   void burst.offsetWidth; // restart animation
   burst.classList.add('fire');
+
+  // Growing seed: completing a real activity grows it (+1). Quizzes are
+  // scored separately (see the quiz finish handlers), so skip those here.
+  if(flagKey && !SEED_QUIZ_FLAGS.includes(flagKey) && flagKey !== SEED_CERT_FLAG){
+    addSeedPts(1);
+  }
 }
 
 /* =========================================================
@@ -2529,6 +2736,41 @@ if('serviceWorker' in navigator){
 }
 
 /* =========================================================
+   INSTALLATION GUIDE GATE — shown on first open, before
+   the registration form. User reads the steps, ticks the
+   checkbox, and agrees; only then does it go to input name.
+========================================================= */
+const guideOverlay = document.getElementById('guideOverlay');
+const guideCheck = document.getElementById('guideCheck');
+const guideAgreeBtn = document.getElementById('guideAgreeBtn');
+const guideError = document.getElementById('guideError');
+
+function showGuideOverlay(){
+  guideCheck.checked = false;
+  guideError.textContent = '';
+  guideOverlay.hidden = false;
+  guideCheck.focus();
+}
+function hideGuideOverlay(){ guideOverlay.hidden = true; }
+
+guideCheck.addEventListener('change', ()=>{
+  if(guideCheck.checked) guideError.textContent = '';
+});
+
+guideAgreeBtn.addEventListener('click', ()=>{
+  if(!guideCheck.checked){
+    guideError.textContent = 'Please tick the checkbox above before continuing.';
+    guideCheck.focus();
+    return;
+  }
+  store.set('guideAccepted', true);
+  guideError.textContent = '';
+  hideGuideOverlay();
+  // After agreeing, go straight to "input name" (registration gate).
+  showRegOverlay();
+});
+
+/* =========================================================
    REGISTRATION GATE — Full name, age, gender, country
 ========================================================= */
 const COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (DRC)','Congo (Republic)','Costa Rica','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Lucia','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe','Other / not listed'];
@@ -2595,7 +2837,13 @@ document.getElementById('profileAvatar').closest('.dev-card').addEventListener('
 });
 
 if(!getProfile()){
-  showRegOverlay();
+  // First run: show the installation guide first; after the user
+  // ticks the box and agrees, it proceeds to the "input name" form.
+  if(!store.get('guideAccepted', false)){
+    showGuideOverlay();
+  }else{
+    showRegOverlay();
+  }
 }else{
   renderProfileInSettings();
 }
@@ -2769,6 +3017,7 @@ function startQuiz(quizId){
     testResults[quiz.id] = { passed, score, date: new Date().toISOString() };
     store.set('testResults', testResults);
     if(passed) awardStamp(quiz.title + ' passed', quiz.flag);
+    addSeedPts(quizSeedPoints(correctCount, questions.length)); // grow seed with quiz score
 
     quizStage.innerHTML = `
       <div class="quiz-result">
@@ -2794,6 +3043,109 @@ function startQuiz(quizId){
 
   renderQuestion();
 }
+
+/* =========================================================
+   DAILY QUIZ — Numbers 1–10 on the dashboard, new each day
+========================================================= */
+const DAILY_NUMBERS = NUMBERS_1_100.slice(0, 10); // numbers 1-10
+const dailyQuizEl = document.getElementById('dailyQuiz');
+let dailyQuestions = [];
+let dailyIdx = 0;
+let dailyAnswers = [];
+
+function renderDailyQuiz(){
+  const rec = store.get('dailyQuiz', null);
+  const doneToday = !!(rec && rec.date === todayKey());
+  if(doneToday){
+    const pass = rec.score >= (PASS_THRESHOLD * 100);
+    dailyQuizEl.innerHTML = `
+      <div class="quiz-result">
+        <div class="quiz-result-score">${rec.score}%</div>
+        <div class="quiz-result-label ${pass?'pass':'fail'}">${pass ? '合格 · Daily quiz passed' : 'Daily quiz done'}</div>
+        <p>You got ${rec.correct} of ${rec.total} right on today's Numbers 1–10 quiz. A fresh quiz arrives tomorrow — come back then to earn another stamp.</p>
+      </div>`;
+    return;
+  }
+  dailyQuizEl.innerHTML = `
+    <p class="daily-intro">Five quick questions on numbers 1–10. The set changes every day.</p>
+    <button class="btn primary" id="dailyStartBtn">Start today's quiz</button>`;
+  document.getElementById('dailyStartBtn').addEventListener('click', startDailyQuiz);
+}
+
+function buildDailyQuestions(){
+  const chosen = sample(DAILY_NUMBERS, Math.min(5, DAILY_NUMBERS.length));
+  return chosen.map(item=>{
+    const distractors = sample(DAILY_NUMBERS.filter(o=>o.jp !== item.jp), 2).map(o=>o.jp);
+    const options = shuffleArr([item.jp, ...distractors]);
+    return { prompt: item.en, options, answer: item.jp };
+  });
+}
+
+function startDailyQuiz(){
+  dailyQuestions = buildDailyQuestions();
+  dailyIdx = 0;
+  dailyAnswers = [];
+  renderDailyQuestion();
+}
+
+function renderDailyQuestion(){
+  const item = dailyQuestions[dailyIdx];
+  dailyQuizEl.innerHTML = `
+    <div class="quiz-stage-head">
+      <span>Daily quiz · Numbers 1–10</span>
+      <span>question ${dailyIdx+1} / ${dailyQuestions.length}</span>
+    </div>
+    <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(dailyIdx/dailyQuestions.length)*100}%"></div></div>
+    <div class="quiz-question small">${item.prompt}</div>
+    <div class="quiz-options" id="dailyOptions"></div>
+    <div class="quiz-feedback" id="dailyFeedback"></div>
+    <div class="quiz-foot">
+      <button class="btn ghost small" id="dailyQuit">← cancel</button>
+      <button class="btn primary small" id="dailyNext" disabled>${dailyIdx===dailyQuestions.length-1 ? 'Finish' : 'Next →'}</button>
+    </div>`;
+  const wrap = document.getElementById('dailyOptions');
+  item.options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'quiz-option';
+    b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      if(b.disabled) return;
+      wrap.querySelectorAll('.quiz-option').forEach(o=>o.disabled = true);
+      const correct = opt === item.answer;
+      b.classList.add(correct ? 'correct' : 'wrong');
+      if(!correct){
+        wrap.querySelectorAll('.quiz-option').forEach(o=>{ if(o.textContent === item.answer) o.classList.add('correct'); });
+      }
+      dailyAnswers.push(correct);
+      document.getElementById('dailyFeedback').textContent = correct ? 'Correct!' : ('Not quite — correct answer: ' + item.answer);
+      document.getElementById('dailyNext').disabled = false;
+    });
+    wrap.appendChild(b);
+  });
+  document.getElementById('dailyQuit').addEventListener('click', renderDailyQuiz);
+  document.getElementById('dailyNext').addEventListener('click', ()=>{
+    if(dailyIdx < dailyQuestions.length-1){
+      dailyIdx++;
+      renderDailyQuestion();
+    }else{
+      finishDailyQuiz();
+    }
+  });
+}
+
+function finishDailyQuiz(){
+  const correct = dailyAnswers.filter(Boolean).length;
+  const total = dailyQuestions.length;
+  const pct = Math.round((correct / total) * 100);
+  const pass = (correct / total) >= PASS_THRESHOLD;
+  store.set('dailyQuiz', { date: todayKey(), score: pct, correct, total });
+  if(pass) awardStamp('daily quiz passed', 'daily-quiz');
+  addSeedPts(quizSeedPoints(correct, total)); // grow seed with daily quiz score
+  renderDailyQuiz();
+}
+
+renderDailyQuiz();
 
 /* =========================================================
    CERTIFICATE
