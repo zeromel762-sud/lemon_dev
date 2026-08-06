@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: sans-serif; }
+    
+    /* Desktop: visible by default */
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 250px;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .content-col { flex: 1; padding: 20px; }
+    
+    /* Mobile: hidden by default */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 80%;
+        max-width: 300px;
+        background: white;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+        z-index: 100;
+        display: none; /* Hidden by default */
+        padding-top: 80px;
+      }
+      .sidebar.open {
+        display: block; /* Shown when open */
+        animation: slideIn 0.25s ease;
+      }
+      .menu-btn {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+      .menu-btn span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: #333;
+      }
+      header {
+        position: relative;
+        z-index: 110;
+        padding: 10px;
+        background: white;
+        border-bottom: 1px solid #ddd;
+      }
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 99;
+      }
+      .overlay.show { display: block; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>Test Page</h1>
+  </header>
+  
+  <div class="overlay" id="overlay"></div>
+  
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <nav>
+        <p>Sidebar content</p>
+        <button class="tab">Tab 1</button>
+        <button class="tab">Tab 2</button>
+        <button class="tab">Tab 3</button>
+      </nav>
+    </aside>
+    <main class="content-col">
+      <h2>Main Content</h2>
+      <p>This is the main content area.</p>
+      <p>Resize the window to test mobile behavior (width ≤ 900px).</p>
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+    
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+    
+    // On mobile, keep sidebar closed by default
+    if (isMobile()) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+    
+    // Toggle sidebar with menu button
+    menuBtn.addEventListener('click', () => {
+      if (isMobile()) {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+      } else {
+        // Desktop: could toggle visibility here
+        console.log('Desktop menu clicked');
+      }
+    });
+    
+    // Close sidebar when clicking overlay
+    overlay.addEventListener('click', closeSidebar);
+    
+    // Close sidebar when clicking a tab (mobile)
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', closeSidebar);
+    });
+    
+    console.log('Is mobile:', isMobile());
+    console.log('Sidebar has "open" class:', sidebar.classList.contains('open'));
+  </script>
+</body>
+</html>

@@ -1106,11 +1106,17 @@
       background:var(--paper); box-shadow:var(--shadow);
       padding-top:80px; min-height:100vh; width:min(78vw,300px);
       overflow-y:auto;
-      transform:translateX(-100%);
-      transition:transform .2s ease;
+      display:none;
     }
-    .sidebar.open{ transform:translateX(0); }
+    .sidebar.open{
+      display:block;
+      animation:slideIn .25s ease;
+    }
     .sidebar-overlay.show{ display:block; }
+  }
+  @keyframes slideIn{
+    from{ transform:translateX(-100%); }
+    to{ transform:translateX(0); }
   }
   .sidebar-overlay{
     display:none; position:fixed; inset:0; background:rgba(33,31,26,.35); z-index:99;
@@ -3616,7 +3622,8 @@ document.querySelectorAll('.tab').forEach(tab=>{
 });
 
 /* =========================================================
-   SIDEBAR — mobile: always visible. desktop: collapse/expand.
+   SIDEBAR — mobile: hidden by default, toggle with menu button.
+   desktop: visible by default, toggle with menu button.
 ========================================================= */
 const sidebarEl = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -3639,12 +3646,12 @@ function closeSidebar(){
   }
 }
 
-// Desktop: remembers hidden/shown state across visits.
-const savedSidebarHidden = store.get('sidebarHidden', false);
-if(!isMobile() && savedSidebarHidden){
-  appShellEl.classList.add('sidebar-hidden');
+// Desktop: ensure sidebar is visible by default and clear any saved hidden state
+if(!isMobile()){
+  appShellEl.classList.remove('sidebar-hidden');
+  store.set('sidebarHidden', false);
 }
-menuBtn.setAttribute('aria-expanded', String(!(!isMobile() && savedSidebarHidden)));
+menuBtn.setAttribute('aria-expanded', 'false');
 
 // On mobile, keep the sidebar closed by default; menu button toggles it.
 if(isMobile()){
