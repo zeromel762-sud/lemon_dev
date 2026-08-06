@@ -3664,6 +3664,7 @@ const sidebarEl = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const appShellEl = document.querySelector('.app-shell');
 const menuBtn = document.getElementById('menuBtn');
+const header = document.querySelector('header');
 const isMobile = ()=> window.matchMedia('(max-width:900px)').matches;
 
 function openSidebar(){
@@ -3707,6 +3708,20 @@ menuBtn.addEventListener('click', handleMenuClick);
 
 // Allow overlay to close sidebar on both mobile and desktop.
 sidebarOverlay.addEventListener('click', closeSidebar);
+
+// Double-click/tap on header to close sidebar on mobile
+let lastClickTime = 0;
+header.addEventListener('click', (e)=>{
+  if(isMobile() && sidebarEl.classList.contains('open') && e.target !== menuBtn && !menuBtn.contains(e.target)){
+    const currentTime = Date.now();
+    if(currentTime - lastClickTime < 300){
+      // Double click detected
+      closeSidebar();
+    }
+    lastClickTime = currentTime;
+  }
+});
+
 window.addEventListener('resize', ()=>{
   if(!isMobile()){ sidebarEl.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
 });
