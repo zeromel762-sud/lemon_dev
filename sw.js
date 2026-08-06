@@ -4,7 +4,7 @@
 // The only thing that ever needs the network is the optional "live"
 // dictionary lookup, which already fails gracefully in index.html.
 
-const CACHE_NAME = 'tenarai-v4';
+const CACHE_NAME = 'tenarai-v14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -51,18 +51,22 @@ function todaysWordSW(){
 }
 
 function todayKeySW(){
-  return new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()); // local date (12:00am rollover)
 }
 
 async function showWordOfDayNotification(){
-  const word = todaysWordSW();
   const already = await self.registration.getNotifications({ tag: 'tenarai-wotd' });
   // Avoid stacking duplicate notifications for the same day if one is
   // already showing (e.g. periodic sync firing close together with an
   // app-open check).
   if (already.length && already[0].data && already[0].data.day === todayKeySW()) return;
+  // The dashboard's word of the day is chosen once per local day with a
+  // no-repeat picker, so we keep the background notification generic and
+  // let the page reveal today's word when it's opened.
   await self.registration.showNotification('今日 · Word of the day', {
-    body: word.jp + '  ' + word.kana + '  (' + word.romaji + ') — ' + word.en,
+    body: 'A new word of the day is waiting — open Tenarai to see it.',
     tag: 'tenarai-wotd',
     renotify: true,
     icon: './icon-192.png',
