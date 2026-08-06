@@ -5,6 +5,7 @@
 // dictionary lookup, which already fails gracefully in index.html.
 
 const CACHE_NAME = 'tenarai-v14';
+const APP_VERSION = '1.0.14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -89,7 +90,14 @@ self.addEventListener('activate', (event) => {
       Promise.all(
         names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))
       )
-    ).then(() => self.clients.claim())
+    ).then(() => {
+      // Notify all clients that a new version is active
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SW_UPDATED', version: APP_VERSION });
+        });
+      });
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -141,6 +149,12 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SHOW_WORD_OF_DAY') {
     event.waitUntil(showWordOfDayNotification());
+  }
+  if (event.data && event.data.type === 'CHECK_VERSION') {
+    event.ports[0].postMessage({ version: APP_VERSION });
+  }
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 

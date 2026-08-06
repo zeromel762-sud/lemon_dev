@@ -143,38 +143,6 @@
   }
   @media(min-width:760px){ .tagline{ display:block; } }
 
-  /* ---------- Header mobile fit ---------- */
-  @media(max-width:760px){
-    header{
-      gap:8px;
-      padding:10px 12px 8px;
-      flex-wrap:wrap;
-    }
-    .brand-text h1{
-      font-size:18px;
-      letter-spacing:0;
-    }
-    .brand-text h1 .en{
-      font-size:9px;
-      letter-spacing:.1em;
-      margin-top:3px;
-    }
-    .brand-mark{
-      width:32px; height:32px;
-    }
-    .coin-badge{
-      font-size:11px;
-      padding:3px 7px;
-    }
-    .stamp-count{
-      font-size:10px;
-    }
-    .install-btn{
-      font-size:11px;
-      padding:4px 8px;
-    }
-  }
-
   /* stamp album — signature element, top right */
   .stamp-album{
     position:relative; z-index:2;
@@ -194,13 +162,14 @@
   .stamp-dot.filled{ background:var(--shu); border-color:var(--shu); }
   .stamp-count{ font-family:'SFMono-Regular','Consolas','Menlo',monospace; font-size:11px; color:var(--sumi-soft); white-space:nowrap; }
 
-  /* coin badge — header, next to stamps (matches market .price pill badge) */
+  /* coin badge — header, next to stamps */
   .coin-badge{
-    position:relative; z-index:2; display:inline-flex; align-items:center; gap:4px;
-    font-family:'SFMono-Regular','Consolas','Menlo',monospace;
-    font-size:13px; font-weight:700; color:var(--shu); white-space:nowrap;
-    background:rgba(178,58,46,.08); padding:4px 10px; border-radius:20px;
+    position:relative; z-index:2; display:flex; align-items:center; gap:4px;
+    padding:4px 10px; border:1px solid var(--line); border-radius:999px;
+    background:rgba(255,253,247,.8); font-family:'SFMono-Regular','Consolas','Menlo',monospace;
+    font-size:11px; color:var(--sumi-soft); white-space:nowrap;
   }
+  .coin-badge #coinDisplay{ font-weight:700; color:var(--ai); }
 
   /* full-screen stamp burst, fires on award */
   .stamp-burst{
@@ -242,7 +211,7 @@
     background:var(--shu); margin-top:-1px;
   }
 
-  /* ---------- Menu button (desktop sidebar toggle) ---------- */
+  /* ---------- Menu button (mobile sidebar toggle) ---------- */
   .menu-btn{
     appearance:none; cursor:pointer; border:1px solid var(--line); background:transparent;
     border-radius:8px; width:40px; height:40px; flex-shrink:0;
@@ -253,7 +222,6 @@
   .menu-btn:hover{ border-color:var(--ai-soft); }
   .menu-btn[aria-expanded="true"]{ background:rgba(178,58,46,.08); border-color:var(--shu); }
   .menu-btn[aria-expanded="true"] span{ background:var(--shu-dark); }
-  @media(max-width:900px){ .menu-btn{ display:none; } }
 
   /* ---------- App shell (sidebar + content) ---------- */
   .app-shell{ position:relative; display:flex; align-items:stretch; }
@@ -296,15 +264,6 @@
   }
   .sidebar-bottom .tab{ font-weight:700; }
   .sidebar-bottom .tab .jp{ font-size:16px; }
-  .sidebar-credit{
-    font-size:10.5px;
-    color:var(--sumi-soft);
-    text-align:center;
-    margin-top:10px;
-    font-family:'SFMono-Regular','Consolas','Menlo',monospace;
-    letter-spacing:.04em;
-    opacity:.7;
-  }
 
   /* ---------- Growing seed (sidebar) ---------- */
   .seed-widget{
@@ -349,15 +308,13 @@
     justify-content:center; 
     align-items:center;
     margin:0 0 8px;
-    padding: 12px;
-    min-height:300px;
+    padding: 8px;
+    min-height:150px;
   }
   .seed-plant svg{ 
-    width:200px; 
-    max-width:280px;
+    width:140px; 
     height:auto;
     filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
-    transition: width .4s ease;
   }
   .seed-stage{
     font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif; font-weight:800;
@@ -447,7 +404,6 @@
   
   .seed-care{
     display:flex;
-    flex-wrap:wrap;
     gap:6px;
     justify-content:center;
     margin:6px 0;
@@ -577,10 +533,9 @@
     border-radius:2px;
   }
   .market-items-grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:14px;
-    justify-content:center;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:18px;
   }
   .market-card{
     border:2px solid var(--line);
@@ -590,9 +545,6 @@
     transition:all .25s ease;
     display:flex;
     flex-direction:column;
-    flex:1 1 180px;
-    max-width:320px;
-    min-width:160px;
     gap:10px;
     position:relative;
     overflow:hidden;
@@ -661,16 +613,6 @@
     text-align:center;
     margin-bottom:8px;
   }
-  /* Align product cards: pin the Buy button to the bottom so every card's
-     controls line up regardless of description length. */
-  .market-card .buy{
-    margin-top:auto;           /* pushes Buy to the bottom of each card */
-    width:100%;
-    padding:11px 14px;
-    font-size:14px;
-    justify-content:center;
-    align-items:center;
-  }
   
   /* ---------- Zen Garden Market ---------- */
   .quantity-selector{
@@ -721,18 +663,6 @@
     color:var(--sumi-soft);
     margin-top:4px;
     font-weight:600;
-  }
-  .market-card .price{
-    font-size:13px;
-    font-weight:700;
-    text-align:center;
-    color:var(--shu);
-    background:rgba(178,58,46,.08);
-    padding:4px 10px;
-    border-radius:20px;
-    display:inline-block;
-    align-self:center;
-    margin-bottom:2px;
   }
   
   /* Garden grid */
@@ -1103,10 +1033,11 @@
     .sidebar{
       position:fixed; top:0; left:0; bottom:0; z-index:100;
       background:var(--paper); box-shadow:var(--shadow);
+      transform:translateX(-100%); transition:transform .25s ease;
       padding-top:80px; min-height:100vh; width:min(78vw,300px);
       overflow-y:auto;
     }
-    .sidebar-overlay{ display:none !important; }
+    .sidebar.open{ transform:translateX(0); }
   }
   .sidebar-overlay{
     display:none; position:fixed; inset:0; background:rgba(33,31,26,.35); z-index:99;
@@ -1469,11 +1400,6 @@
   .notify-note{ margin:12px 0 0; font-size:11.5px; color:var(--sumi-soft); line-height:1.6; }
 
   /* ---------- Dashboard: word of the day ---------- */
-  .today-date{
-    font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif;
-    font-size:16px; font-weight:700; color:var(--shu-dark);
-    margin:6px 0 12px;
-  }
   .wotd-card{
     border:1px solid var(--line); background:rgba(255,253,247,.55); border-radius:var(--radius);
     padding:20px 22px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;
@@ -1553,26 +1479,6 @@
     display:none; align-items:center; gap:6px;
   }
   .install-btn.show{ display:inline-flex; }
-
-  /* ---------- App update overlay ---------- */
-  .update-overlay{
-    position:fixed; inset:0; z-index:10000;
-    background:rgba(246,241,228,.97);
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:18px; opacity:0; pointer-events:none;
-    transition:opacity .35s ease;
-  }
-  .update-overlay.show{ opacity:1; pointer-events:auto; }
-  .update-spinner{
-    width:48px; height:48px;
-    border:4px solid var(--line);
-    border-top-color:var(--shu);
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .update-text{ font-size:16px; color:var(--sumi); font-weight:600; }
 
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
@@ -1814,10 +1720,6 @@
 </head>
 <body>
 <div class="texture"></div>
-<div class="update-overlay" id="updateOverlay" hidden>
-  <div class="update-spinner"></div>
-  <div class="update-text">Updating Tenarai…</div>
-</div>
 
 <div class="reg-overlay" id="regOverlay" hidden>
   <div class="reg-card">
@@ -1896,7 +1798,7 @@
     <div class="stamp-dots" id="stampDots"></div>
     <span class="stamp-count" id="stampCount">0 stamps</span>
   </div>
-  <div class="coin-badge" id="coinBadge" title="Coins earned from lessons"><span id="coinDisplay">0</span> 🪙</div>
+  <div class="coin-badge" id="coinBadge" title="Coins earned from lessons">🪙 <span id="coinDisplay">0</span></div>
 </header>
 
 <div class="flag-strip" aria-hidden="true"></div>
@@ -1919,7 +1821,6 @@
     </nav>
     <div class="sidebar-bottom">
       <button class="tab" data-tab="settings"><span class="jp">設定</span><span class="en">Settings</span></button>
-      <div class="sidebar-credit">serve @2026 by Lemon_dev</div>
     </div>
   </aside>
 
@@ -1931,7 +1832,6 @@
     <div class="section-head">
       <p class="eyebrow">00 · Dashboard</p>
       <h2>今日 · Today</h2>
-      <div class="today-date" id="todayDateLine"></div>
       <p>A new word every day, a little about Japan, and the sights worth knowing before your first trip — or your next lesson.</p>
     </div>
 
@@ -2740,7 +2640,7 @@ const SEED_GOAL = 100;
 const SEED_QUIZ_MAX = 3;                 // points for a perfect score (10/10)
 const SEED_QUIZ_FLAGS = ['quiz-kana','quiz-kanji','quiz-vocab','quiz-phrases','daily-quiz'];
 const SEED_CERT_FLAG = 'certificate';
-let seedPts = store.get('seedPts', 0);
+let seedPts = Math.min(SEED_GOAL, store.get('seedPts', 0));
 const seedEl = document.getElementById('seedGrow');
 
 let seedTreatments = store.get('seedTreatments', 0);     // times watered/fertilized
@@ -2794,7 +2694,6 @@ let inventory = store.get('inventory', {
 if(!inventory || typeof inventory !== 'object') inventory = {};
 if(typeof inventory.water !== 'number') inventory.water = 0;
 if(typeof inventory.fertilizer !== 'number') inventory.fertilizer = 0;
-if(typeof inventory.tanzaku !== 'number') inventory.tanzaku = 0;
 if(!inventory.seeds || typeof inventory.seeds !== 'object') inventory.seeds = {};
 if(!inventory.pots || typeof inventory.pots !== 'object') inventory.pots = {};
 if(!inventory.pets || typeof inventory.pets !== 'object') inventory.pets = {};
@@ -2843,7 +2742,6 @@ const MARKET_ITEMS = [
   // Care items
   { id:'water',      icon:'💧', name:'Water',      cost:5,  growth:2, desc:'Water your plant — +2 growth.', type:'care' },
   { id:'fertilizer', icon:'🌿', name:'Fertilizer', cost:8,  growth:3, desc:'Feed your plant — +3 growth.', type:'care' },
-  { id:'tanzaku',    icon:'🎋', name:'Tanzaku',    cost:100, growth:20, desc:'Hang a Tanabata wish on your bamboo — +20 growth.', type:'care' },
 ];
 
 // ---- Plant growth stages (driven by seedPts) -------------------
@@ -2879,17 +2777,16 @@ function branchPath(ax, ay, side, len, stemColor='#5b8c3f', leafColor='#5f9b47')
          leafPath(tipX, tipY, side, 12, leafColor);
 }
 
-function flower(x, y, flowerColor='#ffb7c5', centerColor='#ff7d9a'){
-  // Cherry-blossom style 🌸 — 5 teardrop petals arranged in a radial bloom.
+function flower(x, y, flowerColor='#fff', centerColor='#ffd700'){
   let petals = '';
-  for(let i=0;i<5;i++){
-    const a = (Math.PI * 2 / 5) * i - Math.PI / 2;   // 5 petals, even spacing
-    const px = x + Math.cos(a) * 8;
-    const py = y + Math.sin(a) * 8;
-    const angleDeg = (a * 180 / Math.PI);
-    petals += `<ellipse cx="${px}" cy="${py}" rx="5.5" ry="8" fill="${flowerColor}" transform="rotate(${angleDeg} ${px} ${py})" opacity=".95"/>`;
+  // Make flowers larger and more visible
+  for(let i=0;i<6;i++){
+    const a = (Math.PI / 3) * i;
+    const px = x + Math.cos(a) * 10;  // Increased from 8 to 10
+    const py = y + Math.sin(a) * 10;  // Increased from 8 to 10
+    petals += `<circle cx="${px}" cy="${py}" r="6" fill="${flowerColor}" opacity=".95"/>`;  // Increased from 5 to 6
   }
-  return `<g transform="translate(${x},${y})">${petals}<circle cx="0" cy="0" r="3.2" fill="${centerColor}"/><circle cx="0" cy="0" r="1.6" fill="#e04a6b"/></g>`;
+  return `<g transform="translate(${x},${y})">${petals}<circle cx="0" cy="0" r="4" fill="${centerColor}"/></g>`;  // Increased from 3.5 to 4
 }
 
 // Get plant SVG based on seed type - with pot visualization
@@ -3021,84 +2918,34 @@ function getPetEmoji(petType){
   return pets[petType] || '🐱';
 }
 
-// Bamboo plant — segmented green stalks that sprout more stalks and grow
-// taller as points climb, with no upper limit. No flowers.
-function bambooStalk(x, baseY, topY, w){
-  let s = '';
-  // stalk body
-  s += `<path d="M${x-w},${baseY} C${x-w},${topY+12} ${x-w},${topY} ${x-w},${topY} L${x+w},${topY} C${x+w},${topY+12} ${x+w},${baseY} ${x+w},${baseY} Z" fill="#63a03f"/>`;
-  // center highlight line for depth
-  s += `<path d="M${x},${baseY} L${x},${topY}" stroke="#3f6b2c" stroke-width="1" opacity="0.5"/>`;
-  // node rings + leaves at alternating nodes
-  const step = 16;
-  let k = 0;
-  let ny = baseY - step;
-  while(ny > topY + 3){
-    s += `<path d="M${x-w+1},${ny} Q${x},${ny+3} ${x+w-1},${ny}" stroke="#3f6b2c" stroke-width="1.5" fill="none"/>`;
-    const side = (k % 2 === 0) ? 1 : -1;
-    s += bambooLeaf(x, ny, side, 13);
-    k++;
-    ny = baseY - step * (k + 1);
-  }
-  return s;
-}
-
-function bambooLeaf(x, y, side, L){
-  return `<path d="M${x},${y} Q${x + side*L*0.6},${y - L*0.6} ${x + side*L},${y - L*0.3} Q${x + side*L*0.6},${y + L*0.2} ${x},${y}" fill="#7cb342"/>`;
-}
-
-// Bamboo grows taller & sprouts more stalks as points climb (no limit).
-function plantSVG(lv, pts){
-  const extra = Math.max(0, (pts || 0) - SEED_GOAL);
-
-  // number of stalks grows with points (starts with ~2 once grown)
-  const baseStalks = lv.stem > 0.5 ? 2 : 1;
-  const extraStalks = Math.floor(extra / 40);
-  const stalks = Math.min(9, Math.max(1, baseStalks + extraStalks));
-
-  // taller & bigger as it grows
-  const heightMul = 1 + Math.min(2.2, extra / 250);
-
-  const baseX = 60, soilY = 96;
-  const maxStem = 68 * heightMul;
+// Simple growing plant — one design that grows with you.
+function plantSVG(lv){
+  const baseX = 60, soilY = 96, maxStem = 70;
   const topY = Math.round(soilY - maxStem * lv.stem);
-
   let s = '';
   // pot
   s += `<rect x="43" y="89" width="34" height="9" rx="3" fill="#7a5c3e"/>`;
   s += `<path d="M45,96 h30 l3,16 h-36 z" fill="#b07b4a"/>`;
   s += `<path d="M44,96 h32" stroke="#8d5a32" stroke-width="2" fill="none"/>`;
-
-  // bamboo clump — draw stalks back-to-front so the front overlaps nicely
-  for(let i=stalks-1; i>=0; i--){
-    const offset = (stalks === 1) ? 0 : (i - (stalks-1)/2) * 9;
-    const x = baseX + offset;
-    const rise = (stalks - 1 - i) * 8;          // front stalks stand taller
-    const stalkTop = topY + Math.max(0, rise);
-    const w = 4 + (stalks - i);                  // front stalks slightly wider
-    s += bambooStalk(x, soilY - 7, stalkTop, w);
+  // main stem
+  s += `<path d="M${baseX},${soilY} C${baseX},${topY+22} ${baseX-3},${topY+8} ${baseX},${topY}"
+        stroke="#5b8c3f" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  // branches
+  if(lv.branches >= 1) s += branchPath(baseX, topY + (soilY-topY)*0.55,  1, 16);
+  if(lv.branches >= 2) s += branchPath(baseX, topY + (soilY-topY)*0.72, -1, 13);
+  if(lv.branches >= 3) s += branchPath(baseX, topY + (soilY-topY)*0.40, -1, 12);
+  // leaves
+  for(let i=0;i<lv.leaves;i++){
+    const f = (i + 0.5) / Math.max(lv.leaves, 1);
+    const y = Math.round(topY + (soilY - topY) * f);
+    const side = (i % 2 === 0) ? 1 : -1;
+    s += leafPath(baseX, y, side, 13);
   }
-
-  // tanzaku wish strips — hang on the bamboo for the day if a tanzaku was used today
-  const tanzakuActive = store.get('tanzakuDate', '') === todayKey();
-  if(tanzakuActive && stalks > 0){
-    const colors = ['#ff6b8a','#ff9e80','#ffd180','#ff80ab','#ffab91'];
-    const count = Math.min(stalks, 5);
-    for(let i=0;i<count;i++){
-      const tx = baseX + ((stalks === 1) ? 0 : (i - (count-1)/2) * 9);
-      const ty = topY + Math.max(0, (stalks - 1 - Math.min(i, stalks-1)) * 8) - 4;
-      const col = colors[i % colors.length];
-      s += `<rect x="${tx-2}" y="${ty}" width="4" height="14" rx="1" fill="${col}" opacity=".92"/>`;
-      s += `<line x1="${tx}" y1="${ty+14}" x2="${tx}" y2="${ty+18}" stroke="#5d4037" stroke-width=".8"/>`;
-    }
-  }
-
-  // dynamic viewBox that expands as bamboo grows taller (no clipping)
-  const minY = Math.min(0, topY) - 8;
-  const maxY = 116;
-  const minX = 4;
-  const maxX = 116;
-  return `<svg viewBox="${minX} ${minY} ${maxX-minX} ${maxY-minY}" role="img" aria-label="Your growing bamboo">${s}</svg>`;
+  // flowers
+  if(lv.flowers >= 1) s += flower(baseX - 16, topY + 2);
+  if(lv.flowers >= 2) s += flower(baseX + 16, topY + 2);
+  if(lv.flowers >= 3) s += flower(baseX, topY - 14);
+  return `<svg viewBox="0 0 120 116" role="img" aria-label="Your growing plant">${s}</svg>`;
 }
 
 function renderSeed(fb){
@@ -3110,29 +2957,16 @@ function renderSeed(fb){
   seedEl.classList.toggle('tended', full);
   seedEl.classList.toggle('thirsty', thirsty);
   
-  // Bring back the old simple growing plant (now grows forever)
-  const plantSVGType = plantSVG(lv, seedPts);
+  // Bring back the old simple growing plant
+  const plantSVGType = plantSVG(lv);
   
-  // Growth label — shows extra "levels" beyond full bloom (unlimited).
-  const extraLv = Math.floor(Math.max(0, seedPts - SEED_GOAL) / 100) + 1;
-  const seedDisplayName = full
-    ? (extraLv > 1 ? '🎋 Bamboo Lv.' + extraLv + ' — still growing!' : '🎋 Bamboo in full grove — keep growing!')
-    : '🌱 Your Growing Bamboo';
-
-  // Words of wisdom shown once the bamboo has fully matured (Japanese + English).
-  const SEED_WISDOM = [
-    { jp:'継続は力なり', rom:'Keizoku wa chikara nari', en:'Persistence is strength.' },
-    { jp:'七転び八起き', rom:'Nanakorobi yaoki', en:'Fall seven times, stand up eight.' },
-    { jp:'努力は報われます', rom:'Doryoku wa mukuwaremasu', en:'Effort will be rewarded.' },
-    { jp:'千里の道も一歩から', rom:'Senri no michi mo ippo kara', en:'A journey of a thousand miles begins with a single step.' },
-    { jp:'竹はまっすぐに育ちます', rom:'Take wa massugu ni sodachimasu', en:'Bamboo grows straight and strong.' }
-  ];
-  const wisdom = SEED_WISDOM[Math.abs(seedPts) % SEED_WISDOM.length];
+  // Seed display name
+  const seedDisplayName = '🌱 Your Growing Plant';
   
   seedEl.innerHTML = `
     <div class="seed-plant">${plantSVGType}</div>
     <div class="seed-stage ${full ? 'flower' : ''}">${seedDisplayName}</div>
-    ${full ? `<div class="seed-bloom-note">🎋 ${wisdom.jp} — <span class="en">${wisdom.rom} · ${wisdom.en}</span></div>` : ''}
+    ${full ? '<div class="seed-bloom-note">🎉 Fully bloomed!</div>' : ''}
     ${thirsty ? '<div class="seed-thirst">💧 I need water or fertilizer!</div>' : ''}
     
     <div class="seed-anim" aria-hidden="true">
@@ -3140,7 +2974,6 @@ function renderSeed(fb){
       <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span>
     </div>
     
-    ${full ? '' : `
     <div class="seed-progress-section">
       <div class="seed-progress-header">
         <span>GROWTH</span>
@@ -3149,9 +2982,9 @@ function renderSeed(fb){
       <div class="seed-bar-large">
         <div class="seed-fill-large ${full ? 'full' : ''}" style="width:${pct}%"></div>
       </div>
-      <div class="seed-pts">${seedPts} pts / ${SEED_GOAL} to grow</div>
+      <div class="seed-pts">${Math.min(seedPts, SEED_GOAL)} / ${SEED_GOAL} points</div>
     </div>
-    `}
+    
     <div class="seed-actions">
       <div class="seed-coins">🪙 ${coins} coins</div>
       ${claimedCoins>0 ? `<div class="seed-claimed">Claimed: ${claimedCoins} 🪙</div>` : ''}
@@ -3160,7 +2993,6 @@ function renderSeed(fb){
     <div class="seed-care">
       <button class="seed-mini" id="seedUseWater" ${inventory.water<=0?'disabled':''}>💧 Water (${inventory.water})</button>
       <button class="seed-mini" id="seedUseFert" ${inventory.fertilizer<=0?'disabled':''}>🌿 Fertilizer (${inventory.fertilizer})</button>
-      <button class="seed-mini" id="seedUseTanzaku" ${inventory.tanzaku<=0?'disabled':''}>🎋 Wish (${inventory.tanzaku})</button>
     </div>
     
     ${openPending>0 ? `<button class="seed-claim" id="seedClaimBtn">Claim +${openPending} 🪙</button>` : ''}
@@ -3168,28 +3000,25 @@ function renderSeed(fb){
   `;
   const wBtn = document.getElementById('seedUseWater');
   const fBtn = document.getElementById('seedUseFert');
-  const tBtn = document.getElementById('seedUseTanzaku');
   if(wBtn) wBtn.addEventListener('click', ()=> useSeedItem('water'));
   if(fBtn) fBtn.addEventListener('click', ()=> useSeedItem('fertilizer'));
-  if(tBtn) tBtn.addEventListener('click', ()=> useSeedItem('tanzaku'));
   const cBtn = document.getElementById('seedClaimBtn');
   if(cBtn) cBtn.addEventListener('click', claimOpenBonus);
 }
 
 function addSeedPts(n){
+  if(seedPts >= SEED_GOAL){ renderSeed(); return; }
   const before = seedPts;
-  seedPts = Math.max(0, seedPts + n);          // grow without an upper limit
+  seedPts = Math.min(SEED_GOAL, seedPts + n);
   store.set('seedPts', seedPts);
   renderSeed();
-  if(before < SEED_GOAL && seedPts >= SEED_GOAL){
-    // Celebrate the first bloom.
+  if(seedPts >= SEED_GOAL && before < SEED_GOAL){
+    // Celebrate the bloom into a sakura tree.
     const burst = document.getElementById('stampBurst');
-    if(burst){
-      burst.querySelector('.small').textContent = '🎋 your bamboo sprouted a grove!';
-      burst.classList.remove('fire');
-      void burst.offsetWidth;
-      burst.classList.add('fire');
-    }
+    burst.querySelector('.small').textContent = '🌸 your plant flowered!';
+    burst.classList.remove('fire');
+    void burst.offsetWidth;
+    burst.classList.add('fire');
   }
 }
 
@@ -3239,13 +3068,10 @@ function useSeedItem(id){
   store.set('seedTreatments', seedTreatments);
   store.set('lastTended', lastTended);
   seedEl.classList.add(id === 'water' ? 'watering' : 'fertilizing');
-  if(id === 'tanzaku') store.set('tanzakuDate', todayKey());
   setTimeout(()=>{
     seedEl.classList.remove('watering','fertilizing');
     addSeedPts(item.growth);
-    renderSeed(id === 'tanzaku'
-      ? '🎋 Your wish is hung on the bamboo! +' + item.growth + ' growth'
-      : '+' + item.growth + ' growth — looks a bit different!');
+    renderSeed('+' + item.growth + ' growth — looks a bit different!');
     renderMarket();
   }, 1500);
 }
@@ -3332,7 +3158,6 @@ function renderMarket(){
             <div class="market-card">
               <div class="icon">${item.icon}</div>
               <div class="name">${item.name}</div>
-              <div class="price">${item.cost} 🪙</div>
               <div class="desc">${item.desc}</div>
               <div class="owned">Owned: ${owned}</div>
               <div class="quantity-selector">
@@ -3340,7 +3165,7 @@ function renderMarket(){
                 <span class="qty-display">${qty}</span>
                 <button onclick="changeQuantity('${item.id}', 1)" ${qty >= maxQty ? 'disabled' : ''}>+</button>
               </div>
-              ${qty > 1 ? `<div class="total-price">Total: ${total} 🪙</div>` : `<div class="total-price">${total} 🪙</div>`}
+              ${qty > 1 ? `<div class="total-price">Total: ${total} 🪙</div>` : ''}
               <button class="btn small primary buy" data-id="${item.id}" ${afford?'':'disabled'}>Buy</button>
             </div>`;
         }).join('')}
@@ -3383,6 +3208,10 @@ window.addEventListener('load', ()=>{
   // Render everything after DOM is fully loaded
   renderMarket();
   renderSeed();
+  
+  // Initialize daily rotation
+  setInterval(refreshDailyContent, 30000);
+  
   console.log('App initialized successfully');
 });
 
@@ -3612,7 +3441,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
 });
 
 /* =========================================================
-   SIDEBAR — mobile: always visible. desktop: collapse/expand.
+   SIDEBAR — mobile: slide-in drawer. desktop: collapse/expand.
 ========================================================= */
 const sidebarEl = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -3642,15 +3471,9 @@ if(!isMobile() && savedSidebarHidden){
 }
 menuBtn.setAttribute('aria-expanded', String(!(!isMobile() && savedSidebarHidden)));
 
-// On mobile, keep the sidebar always open and ignore the menu button.
-if(isMobile()){
-  sidebarEl.classList.add('open');
-  sidebarOverlay.classList.remove('show');
-}
-
 function handleMenuClick(){
   if(isMobile()){
-    // Mobile: sidebar is always visible, menu button does nothing.
+    sidebarEl.classList.contains('open') ? closeSidebar() : openSidebar();
   }else{
     const nowHidden = appShellEl.classList.toggle('sidebar-hidden');
     menuBtn.setAttribute('aria-expanded', String(!nowHidden));
@@ -3662,14 +3485,11 @@ menuBtn.addEventListener('touchend', (e)=>{
   e.preventDefault();
   handleMenuClick();
 });
-// Only allow overlay close on desktop.
-if(!isMobile()){
-  sidebarOverlay.addEventListener('click', closeSidebar);
-  sidebarOverlay.addEventListener('touchend', (e)=>{
-    e.preventDefault();
-    closeSidebar();
-  });
-}
+sidebarOverlay.addEventListener('click', closeSidebar);
+sidebarOverlay.addEventListener('touchend', (e)=>{
+  e.preventDefault();
+  closeSidebar();
+});
 window.addEventListener('resize', ()=>{
   if(!isMobile()){ sidebarEl.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
 });
@@ -3756,9 +3576,6 @@ document.getElementById('wotdEn').textContent = wotd.en;
 document.getElementById('wotdExample').innerHTML = wotd.ex + '<span class="en">— ' + wotd.exEn + '</span>';
 document.getElementById('wotdListenBtn').addEventListener('click', ()=> speakJapanese(wotd.jp));
 
-// Show today's date on the dashboard right away.
-renderTodayDate();
-
 /* =========================================================
    NOTIFICATIONS — daily word of the day, on phone and browser.
    Uses the service worker so the notification can be shown even
@@ -3782,20 +3599,8 @@ function todayKey(){
 // Track the last rendered day so we can auto-refresh at midnight.
 let _lastDayKey = todayKey();
 
-// Show today's date on the dashboard (updates automatically at midnight).
-function renderTodayDate(){
-  const el = document.getElementById('todayDateLine');
-  if(!el) return;
-  try{
-    el.textContent = new Date().toLocaleDateString(undefined, {
-      weekday:'long', year:'numeric', month:'long', day:'numeric'
-    });
-  }catch(e){ el.textContent = new Date().toDateString(); }
-}
-
 function refreshDailyContent(){
   const currentDay = todayKey();
-  renderTodayDate();               // always keep the date line fresh
   if(currentDay !== _lastDayKey){
     _lastDayKey = currentDay;
     // Word of the day: pick a fresh one for the new day.
@@ -3824,13 +3629,6 @@ function refreshDailyContent(){
     renderSeed();
   }
 }
-
-// Refresh daily content when the tab becomes visible/focused again — covers the
-// case where the 30s timer was throttled while the tab sat in the background.
-document.addEventListener('visibilitychange', ()=>{
-  if(!document.hidden) refreshDailyContent();
-});
-window.addEventListener('focus', refreshDailyContent);
 
 // Check for midnight rollover every 30 seconds.
 setInterval(refreshDailyContent, 30000);
@@ -4692,128 +4490,37 @@ updateOnlineStatus();
 ========================================================= */
 let deferredInstallPrompt = null;
 const installBtn = document.getElementById('installBtn');
-
-// Detect platforms
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-// Hide install button when already running as installed PWA
-if(isStandalone){
-  if(installBtn) installBtn.style.display = 'none';
-}
-
-// Chromium: beforeinstallprompt fires when the browser deems the app installable
 window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredInstallPrompt = e;
-  if(installBtn) installBtn.classList.add('show');
+  installBtn.classList.add('show');
 });
-
-// iOS Safari: no beforeinstallprompt — show a custom "Add to Home Screen" button
-if(isIOS && !isStandalone){
-  if(installBtn){
-    installBtn.textContent = '📱 Add to Home Screen';
-    installBtn.classList.add('show');
-    installBtn.addEventListener('click', ()=>{
-      showIOSInstallGuide();
-    });
-  }
-}
-
-// Generic install button handler (Chromium)
 installBtn.addEventListener('click', async ()=>{
-  if(deferredInstallPrompt){
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    installBtn.classList.remove('show');
-  }
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.classList.remove('show');
 });
-
 window.addEventListener('appinstalled', ()=>{
-  if(installBtn) installBtn.classList.remove('show');
+  installBtn.classList.remove('show');
 });
-
-// iOS install guide: show a modal with "Add to Home Screen" steps
-function showIOSInstallGuide(){
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML = `
-    <div style="background:#fff;border-radius:16px;max-width:360px;width:100%;padding:24px;text-align:center;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-      <div style="font-size:48px;margin-bottom:8px;">📱</div>
-      <h2 style="margin:0 0 8px;font-size:20px;color:#1a1a1a;">Install Tenarai on iOS</h2>
-      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
-        Tap the <strong>Share</strong> button <span style="display:inline-block;width:18px;height:18px;background:#007aff;border-radius:4px;color:#fff;font-size:12px;line-height:18px;text-align:center;vertical-align:middle;">↑</span> at the bottom of your browser, then tap <strong>"Add to Home Screen"</strong>.
-      </p>
-      <button id="iosGuideClose" style="background:#b23a2e;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:15px;cursor:pointer;width:100%;">Got it</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  overlay.querySelector('#iosGuideClose').addEventListener('click', ()=> overlay.remove());
-  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) overlay.remove(); });
-}
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    const APP_VERSION = '1.0.14';
-    const updateOverlay = document.getElementById('updateOverlay');
-
-    function showUpdateAnimation(callback){
-      if(!updateOverlay) return callback();
-      updateOverlay.hidden = false;
-      // Force reflow so the transition plays
-      updateOverlay.offsetHeight;
-      updateOverlay.classList.add('show');
-      setTimeout(()=>{
-        updateOverlay.classList.remove('show');
-        setTimeout(()=>{
-          updateOverlay.hidden = true;
-          if(callback) callback();
-        }, 400);
-      }, 1200);
-    }
-
-    navigator.serviceWorker.register('sw.js').then((registration)=>{
-      // When a newer service worker takes control, reload so the fresh
-      // app shell is used. The service worker deletes old app caches on
-      // activate, and your saved data lives in localStorage — it is
-      // never touched, so progress/points stay intact.
+    // Registered relative to this file's own path, so it works whether
+    // the app is hosted at a domain root or a sub-path.
+    navigator.serviceWorker.register('sw.js').then(()=>{
+      // Auto-update: when a newer service worker takes control (after an
+      // update), reload so the fresh app shell is used. The service worker
+      // deletes old app caches on activate, and your saved data lives in
+      // localStorage — it is never touched, so progress/points stay intact.
       navigator.serviceWorker.addEventListener('controllerchange', ()=>{
         window.location.reload();
       });
-
-      // Detect when a new SW is found and force it to activate immediately
-      registration.addEventListener('updatefound', ()=>{
-        const newWorker = registration.installing;
-        if(!newWorker) return;
-        newWorker.addEventListener('statechange', ()=>{
-          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-            // New version available — show animation and reload
-            showUpdateAnimation(()=>{
-              window.location.reload();
-            });
-          }
-        });
-      });
-
-      // Check if the current SW version matches the app version
-      if(navigator.serviceWorker.controller){
-        const messageChannel = new MessageChannel();
-        messageChannel.port1.onmessage = (event)=>{
-          if(event.data && event.data.version && event.data.version !== APP_VERSION){
-            // Version mismatch — send skip waiting to activate new SW
-            if(registration.waiting){
-              registration.waiting.postMessage({type: 'SKIP_WAITING'});
-            }
-          }
-        };
-        navigator.serviceWorker.controller.postMessage(
-          {type: 'CHECK_VERSION'},
-          [messageChannel.port2]
-        );
-      }
-    }).catch((err)=>{
-      console.warn('Tenarai: service worker registration failed. The app still works, but PWA install requires serving over HTTP/HTTPS (not file://).', err);
+    }).catch(()=>{
+      // Registration fails silently on file:// or unsupported hosts —
+      // the app still works fully, it just won't be installable there.
     });
   });
 }
@@ -4831,33 +4538,6 @@ const guideError = document.getElementById('guideError');
 function showGuideOverlay(){
   guideCheck.checked = false;
   guideError.textContent = '';
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const titleEl = guideOverlay.querySelector('.reg-mark');
-  const h2 = guideOverlay.querySelector('h2');
-  const sub = guideOverlay.querySelector('.reg-sub');
-  const list = guideOverlay.querySelector('.guide-list');
-  const note = guideOverlay.querySelector('.guide-note');
-  
-  if(isIOS){
-    h2.textContent = 'Install Tenarai on iOS';
-    sub.textContent = 'Follow these steps to add Tenarai to your Home Screen for offline use.';
-    list.innerHTML = `
-      <li><span class="guide-num">1</span><span>Open this page in <strong>Safari</strong> (not Chrome or any other browser).</span></li>
-      <li><span class="guide-num">2</span><span>Tap the <strong>Share</strong> button <span style="display:inline-block;width:16px;height:16px;background:#007aff;border-radius:3px;color:#fff;font-size:10px;line-height:16px;text-align:center;vertical-align:middle;">↑</span> at the bottom of the screen.</span></li>
-      <li><span class="guide-num">3</span><span>Scroll down and tap <strong>"Add to Home Screen"</strong>.</span></li>
-      <li><span class="guide-num">4</span><span>Tap <strong>Add</strong> in the top-right corner.</span></li>
-    `;
-    note.textContent = '💡 Once added, Tenarai runs from your Home Screen with no internet needed.';
-  } else {
-    h2.textContent = 'Installation Guide';
-    sub.textContent = 'Follow these steps to install Tenarai on your device so it works fully offline.';
-    list.innerHTML = `
-      <li><span class="guide-num">1</span><span>Open this page in <strong>Chrome</strong> or <strong>Edge</strong>.</span></li>
-      <li><span class="guide-num">2</span><span>Tap the <strong>Install App</strong> button at the top of the page, or use the browser menu (⋮) → <strong>"Install Tenarai"</strong>.</span></li>
-      <li><span class="guide-num">3</span><span>Follow the on-screen instructions to complete the installation.</span></li>
-    `;
-    note.textContent = '💡 Once installed, Tenarai runs in its own window with no internet needed.';
-  }
   guideOverlay.hidden = false;
   guideCheck.focus();
 }
@@ -5329,6 +5009,39 @@ function finishDailyQuiz(){
 }
 
 renderDailyQuiz();
+
+/* =========================================================
+   MIDNIGHT ROLLOVER — refresh the daily word + daily quiz
+   automatically at 12:00am so content changes even if the
+   page is left open. Also ensures WOTD never repeats until
+   the whole pool has been shown.
+========================================================= */
+let _lastDayKey = todayKey();
+setInterval(()=>{
+  const nowKey = todayKey();
+  if(nowKey !== _lastDayKey){
+    _lastDayKey = nowKey;
+    // Re-pick and render the word of the day for the new day.
+    const w = todaysWord();
+    const g = document.getElementById('wotdGlyph');
+    const k = document.getElementById('wotdKana');
+    const r = document.getElementById('wotdRomaji');
+    const en = document.getElementById('wotdEn');
+    const ex = document.getElementById('wotdExample');
+    const lb = document.getElementById('wotdListenBtn');
+    if(g) g.textContent = w.jp;
+    if(k) k.textContent = w.kana;
+    if(r) r.textContent = w.romaji;
+    if(en) en.textContent = w.en;
+    if(ex) ex.innerHTML = w.ex + '<span class="en">— ' + w.exEn + '</span>';
+    if(lb) lb.onclick = ()=> speakJapanese(w.jp);
+    // Re-render the daily quiz for the new day.
+    dailyQuestions = [];
+    dailyIdx = 0;
+    dailyAnswers = [];
+    renderDailyQuiz();
+  }
+}, 1000);
 
 /* =========================================================
    CERTIFICATE
