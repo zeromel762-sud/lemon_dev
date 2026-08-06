@@ -1100,11 +1100,16 @@
   }
 
   @media(max-width:900px){
-    header{ z-index:110; }
+    header{ 
+      z-index:110; 
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px 8px;
+    }
     .sidebar{
       position:fixed; top:0; left:0; bottom:0; z-index:100;
       background:var(--paper); box-shadow:var(--shadow);
-      padding-top:80px; min-height:100vh; width:min(78vw,300px);
+      padding-top:75px; min-height:100vh; width:min(78vw,300px);
       overflow-y:auto;
       display:none;
     }
@@ -1113,6 +1118,36 @@
       animation:slideIn .25s ease;
     }
     .sidebar-overlay.show{ display:block; }
+    .brand-mark{
+      width:32px; height:32px;
+    }
+    .brand-text h1{
+      font-size:18px;
+      letter-spacing:0;
+    }
+    .brand-text h1 .en{
+      font-size:9px;
+      letter-spacing:.1em;
+      margin-top:3px;
+    }
+    .coin-badge{
+      font-size:11px;
+      padding:3px 7px;
+    }
+    .stamp-count{
+      font-size:10px;
+    }
+    .install-btn{
+      font-size:11px;
+      padding:4px 8px;
+    }
+    .menu-btn{
+      padding: 6px;
+    }
+    .menu-btn span{
+      width:20px;
+      height:2px;
+    }
   }
   @keyframes slideIn{
     from{ transform:translateX(-100%); }
@@ -3669,16 +3704,9 @@ function handleMenuClick(){
   }
 }
 menuBtn.addEventListener('click', handleMenuClick);
-menuBtn.addEventListener('touchend', (e)=>{
-  e.preventDefault();
-  handleMenuClick();
-});
+
 // Allow overlay to close sidebar on both mobile and desktop.
 sidebarOverlay.addEventListener('click', closeSidebar);
-sidebarOverlay.addEventListener('touchend', (e)=>{
-  e.preventDefault();
-  closeSidebar();
-});
 window.addEventListener('resize', ()=>{
   if(!isMobile()){ sidebarEl.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
 });
