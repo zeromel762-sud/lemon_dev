@@ -1,0 +1,23 @@
+{
+  "name": "tenarai",
+  "version": "1.0.0",
+  "description": "Tenarai - Learn Japanese by hand, by ear",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeromel762-sud/lemon_dev.git"
+  },
+  "keywords": ["japanese", "learning", "pwa"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zeromel762-sud/lemon_dev/issues"
+  },
+  "homepage": "https://github.com/zeromel762-sud/lemon_dev#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
